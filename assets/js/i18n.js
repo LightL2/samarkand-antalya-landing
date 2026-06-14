@@ -21,7 +21,7 @@ window.I18N = {
     "hero.ctaTour": "Забронировать тур",
     "hero.ctaInfo": "Что входит",
     "hero.stat1n": "от 10,1 млн",
-    "hero.stat1l": "сум / чел.",
+    "hero.stat1l": "сум на человека",
     "hero.stat2n": "7 ночей",
     "hero.stat2l": "у моря",
     "hero.stat3n": "0",
@@ -29,8 +29,8 @@ window.I18N = {
 
     "price.tag": "Всё включено",
     "price.from": "от",
-    "price.cur": "сум / чел.",
-    "price.note": "2-местное · 7 ночей",
+    "price.cur": "сум на человека",
+    "price.note": "7 ночей · при двухместном размещении",
     "price.i1": "Прямой перелёт Uzbekistan Airways",
     "price.i2": "Проживание 7 ночей",
     "price.i3": "Питание по концепции отеля",
@@ -104,7 +104,7 @@ window.I18N = {
     "faq.q2": "Что входит в тур?",
     "faq.a2": "Перелёт, 7 ночей в отеле, питание, трансфер и страховка. Цена — на человека при двухместном размещении.",
     "faq.q3": "Сколько стоит?",
-    "faq.a3": "От 10,1 млн сум за 7 ночей. Точная цена зависит от отеля — оставьте заявку, рассчитаем бесплатно.",
+    "faq.a3": "От 10,1 млн сум на человека за 7 ночей. Точная цена зависит от отеля — оставьте заявку, рассчитаем бесплатно.",
     "faq.q4": "Как забронировать?",
     "faq.a4": "Заявка на сайте, звонок (71) 201 77 77 или офис Asialuxe Travel.",
     "faq.q5": "Подходит для семей с детьми?",
@@ -124,7 +124,7 @@ window.I18N = {
 
     "lang.main": "Основной",
 
-    "mob.price": "от 10,1 млн сум · 7 ночей",
+    "mob.price": "от 10,1 млн сум на чел. · 7 ночей",
     "mob.cta": "Забронировать тур",
 
     "footer.about": "Asialuxe Travel — прямые рейсы Самарканд — Анталья.",
@@ -159,7 +159,7 @@ window.I18N = {
     "hero.ctaTour": "Turni band qilish",
     "hero.ctaInfo": "Nimalar kiradi",
     "hero.stat1n": "10,1 mln dan",
-    "hero.stat1l": "soʻm / kishi",
+    "hero.stat1l": "soʻm kishi boshiga",
     "hero.stat2n": "7 kecha",
     "hero.stat2l": "dengiz boʻyida",
     "hero.stat3n": "0",
@@ -167,8 +167,8 @@ window.I18N = {
 
     "price.tag": "Hammasi ichida",
     "price.from": "dan",
-    "price.cur": "soʻm / kishi",
-    "price.note": "2 kishilik · 7 kecha",
+    "price.cur": "soʻm kishi boshiga",
+    "price.note": "7 kecha · ikki kishilik xonada",
     "price.i1": "Uzbekistan Airways toʻgʻridan-toʻgʻri reysi",
     "price.i2": "7 kecha turar joy",
     "price.i3": "Mehmonxona boʻyicha ovqatlanish",
@@ -240,9 +240,9 @@ window.I18N = {
     "faq.q1": "Reyslar qachon?",
     "faq.a1": "Har hafta payshanba kunlari Uzbekistan Airways bortida.",
     "faq.q2": "Turga nimalar kiradi?",
-    "faq.a2": "Parvoz, 7 kecha mehmonxona, ovqatlanish, transfer va sugʻurta. Narx — ikki kishilik joylashuvda.",
+    "faq.a2": "Parvoz, 7 kecha mehmonxona, ovqatlanish, transfer va sugʻurta. Narx kishi boshiga — ikki kishilik xonada.",
     "faq.q3": "Qancha turadi?",
-    "faq.a3": "7 kecha — 10,1 mln soʻmdan. Aniq narx mehmonxonaga bogʻliq — ariza qoldiring, bepul hisoblab beramiz.",
+    "faq.a3": "7 kecha — kishi boshiga 10,1 mln soʻmdan. Aniq narx mehmonxonaga bogʻliq — ariza qoldiring, bepul hisoblab beramiz.",
     "faq.q4": "Qanday band qilish?",
     "faq.a4": "Saytda ariza, (71) 201 77 77 qoʻngʻiroq yoki Asialuxe Travel ofisi.",
     "faq.q5": "Bolali oilalar uchun mosmi?",
@@ -262,7 +262,7 @@ window.I18N = {
 
     "lang.main": "Asosiy til",
 
-    "mob.price": "10,1 mln soʻmdan · 7 kecha",
+    "mob.price": "10,1 mln soʻmdan · kishi boshiga · 7 kecha",
     "mob.cta": "Turni band qilish",
 
     "footer.about": "Asialuxe Travel — Samarqand — Antalya toʻgʻridan-toʻgʻri reyslari.",

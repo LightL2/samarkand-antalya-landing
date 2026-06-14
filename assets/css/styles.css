@@ -412,7 +412,7 @@ ul { margin: 0; padding: 0; list-style: none; }
   background: var(--blue);
   border-radius: 50%;
   box-shadow: 0 4px 14px rgba(0,115,255,.45);
-  transform: rotate(90deg);
+  transform: rotate(-45deg);
   flex-shrink: 0;
 }
 
@@ -1524,7 +1524,7 @@ html.lang-pending .mob-cta {
   .hero__inner { padding: 72px var(--space-5) 80px; }
   .hero__stats { gap: var(--space-3); }
   .hero__stat { padding: var(--space-4) var(--space-5); }
-  .hero__plane { transform: rotate(8deg); }
+  .hero__plane { transform: rotate(-45deg); }
   .footer__inner { grid-template-columns: 2fr 1fr 1fr; }
   .section { padding: 80px 0; }
 }
