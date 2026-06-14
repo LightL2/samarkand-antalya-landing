@@ -7,7 +7,7 @@ window.I18N = {
     "doc.title": "Прямые рейсы Самарканд — Анталья | Asialuxe Travel",
 
     "nav.includes": "Что входит",
-    "nav.why": "Почему прямой",
+    "nav.why": "Преимущества",
     "nav.schedule": "Расписание",
     "nav.office": "Офис",
     "nav.faq": "Вопросы",
@@ -58,7 +58,7 @@ window.I18N = {
 
     "why.badgeN": "0",
     "why.badgeL": "пересадок",
-    "why.eyebrow": "Почему прямой",
+    "why.eyebrow": "Преимущества",
     "why.title": "Проще для всей семьи",
     "why.p1": "Раньше — ночные переезды в Ташкент с багажом и детьми. Теперь — прямой рейс из аэропорта Самарканда каждый четверг.",
     "why.l1": "Без дороги в Ташкент и ночных переездов",
@@ -145,7 +145,7 @@ window.I18N = {
     "doc.title": "Toʻgʻridan-toʻgʻri Samarqand — Antalya reyslari | Asialuxe Travel",
 
     "nav.includes": "Nimalar kiradi",
-    "nav.why": "Nega toʻgʻridan-toʻgʻri",
+    "nav.why": "Afzalliklar",
     "nav.schedule": "Jadval",
     "nav.office": "Ofis",
     "nav.faq": "Savollar",
@@ -196,7 +196,7 @@ window.I18N = {
 
     "why.badgeN": "0",
     "why.badgeL": "tranzitlar",
-    "why.eyebrow": "Nega toʻgʻridan-toʻgʻri",
+    "why.eyebrow": "Afzalliklar",
     "why.title": "Butun oila uchun oson",
     "why.p1": "Ilgari — Toshkentga tungi yoʻl, bagaj va bolalar bilan. Endi — har payshanba Samarqand aeroportidan toʻgʻridan-toʻgʻri reys.",
     "why.l1": "Toshkentgacha yoʻl va tungi koʻchishlar yoʻq",
