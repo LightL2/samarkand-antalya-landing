@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uz">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -46,7 +46,7 @@
     gtag('config', 'AW-18224907931', { 'allow_enhanced_conversions': true });
   </script>
 </head>
-<body data-lang="ru">
+<body data-lang="uz">
 
   <!-- ====================== HEADER ====================== -->
   <header class="header" id="header">
@@ -70,8 +70,8 @@
         </a>
 
         <div class="lang" role="group" aria-label="Язык / Til">
-          <button type="button" class="lang__btn is-active" data-lang-btn="ru">RU</button>
-          <button type="button" class="lang__btn" data-lang-btn="uz">UZ</button>
+          <button type="button" class="lang__btn" data-lang-btn="ru">RU</button>
+          <button type="button" class="lang__btn is-active" data-lang-btn="uz">UZ</button>
         </div>
 
         <a href="#lead" class="btn btn--accent btn--sm" data-i18n="nav.cta">Оставить заявку</a>
@@ -108,11 +108,20 @@
         </span>
 
         <h1 class="hero__title">
-          <span data-i18n="hero.title1">Прямые рейсы</span>
-          <span class="hero__route">
-            <span data-i18n="hero.from">Самарканд</span>
-            <svg class="hero__plane" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M2.5 12.5 21 4l-6 17-3.5-6.5L2.5 12.5Z"/></svg>
-            <span data-i18n="hero.to">Анталья</span>
+          <span class="hero__title-text" data-i18n="hero.title1">Прямые рейсы</span>
+          <span class="hero__route" aria-label="Самарканд — Анталья">
+            <span class="hero__city hero__city--from">
+              <span class="hero__city-name" data-i18n="hero.from">Самарканд</span>
+              <span class="hero__city-code">SKD</span>
+            </span>
+            <span class="hero__flight" aria-hidden="true">
+              <span class="hero__flight-track"></span>
+              <svg class="hero__plane" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M2.5 12.5 21 4l-6 17-3.5-6.5L2.5 12.5Z"/></svg>
+            </span>
+            <span class="hero__city hero__city--to">
+              <span class="hero__city-name" data-i18n="hero.to">Анталья</span>
+              <span class="hero__city-code">AYT</span>
+            </span>
           </span>
         </h1>
 
@@ -313,7 +322,7 @@
           </label>
         </div>
         <input type="hidden" name="ts" id="formTs" />
-        <input type="hidden" name="lang" id="formLang" value="ru" />
+        <input type="hidden" name="lang" id="formLang" value="uz" />
         <input type="hidden" name="page" value="samarkand-antalya" />
 
         <div class="field">
@@ -530,19 +539,20 @@
   <div class="modal modal--lang" id="langModal" hidden>
     <div class="modal__backdrop"></div>
     <div class="modal__box modal__box--lang" role="dialog" aria-modal="true" aria-labelledby="langModalTitle">
-      <div class="lang-modal__brand">
-        <img src="assets/img/asialuxe-logo.png" alt="Asialuxe Travel" class="lang-modal__logo" width="160" height="40" />
-      </div>
-      <h3 id="langModalTitle" class="lang-modal__title">Выберите язык</h3>
-      <p class="lang-modal__sub">Tilni tanlang</p>
+      <img src="assets/img/asialuxe-favicon.png" alt="Asialuxe Travel" class="lang-modal__logo" width="140" height="44" />
+      <h3 id="langModalTitle" class="lang-modal__title">Tilni tanlang</h3>
+      <p class="lang-modal__sub">Выберите язык</p>
       <div class="lang-modal__choices">
+        <button type="button" class="lang-modal__btn lang-modal__btn--primary" data-pick-lang="uz">
+          <span class="lang-modal__code">UZ</span>
+          <span class="lang-modal__name">
+            O'zbekcha
+            <small data-i18n="lang.main">Asosiy til</small>
+          </span>
+        </button>
         <button type="button" class="lang-modal__btn" data-pick-lang="ru">
           <span class="lang-modal__code">RU</span>
           <span class="lang-modal__name">Русский</span>
-        </button>
-        <button type="button" class="lang-modal__btn" data-pick-lang="uz">
-          <span class="lang-modal__code">UZ</span>
-          <span class="lang-modal__name">O'zbekcha</span>
         </button>
       </div>
     </div>

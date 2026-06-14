@@ -122,6 +122,8 @@ window.I18N = {
     "office.cta": "Построить маршрут",
     "office.showMap": "Показать интерактивную карту",
 
+    "lang.main": "Основной",
+
     "mob.price": "от 10,1 млн сум · 7 ночей",
     "mob.cta": "Забронировать тур",
 
@@ -161,7 +163,7 @@ window.I18N = {
     "hero.stat2n": "7 kecha",
     "hero.stat2l": "dengiz boʻyida",
     "hero.stat3n": "0",
-    "hero.stat3l": "transit",
+    "hero.stat3l": "tranzitlar",
 
     "price.tag": "Hammasi ichida",
     "price.from": "dan",
@@ -193,7 +195,7 @@ window.I18N = {
     "includes.c5d": "Butun dam olish davriga",
 
     "why.badgeN": "0",
-    "why.badgeL": "transit",
+    "why.badgeL": "tranzitlar",
     "why.eyebrow": "Nega toʻgʻridan-toʻgʻri",
     "why.title": "Butun oila uchun oson",
     "why.p1": "Ilgari — Toshkentga tungi yoʻl, bagaj va bolalar bilan. Endi — har payshanba Samarqand aeroportidan toʻgʻridan-toʻgʻri reys.",
@@ -257,6 +259,8 @@ window.I18N = {
     "office.addr": "Samarqand sh., Gagarin koʻchasi, 81",
     "office.cta": "Marshrut tuzish",
     "office.showMap": "Interaktiv xaritani ko'rsatish",
+
+    "lang.main": "Asosiy til",
 
     "mob.price": "10,1 mln soʻmdan · 7 kecha",
     "mob.cta": "Turni band qilish",

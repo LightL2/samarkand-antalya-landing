@@ -20,7 +20,7 @@
   /* ---------- i18n ---------- */
   var dict = window.I18N || {};
   var savedLang = localStorage.getItem("al_lang");
-  var lang = (savedLang === "uz") ? "uz" : "ru";
+  var lang = (savedLang === "ru") ? "ru" : "uz";
 
   function t(key) {
     return (dict[lang] && dict[lang][key]) || (dict.ru && dict.ru[key]) || key;
