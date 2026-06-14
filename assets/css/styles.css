@@ -597,22 +597,32 @@ ul { margin: 0; padding: 0; list-style: none; }
   color: #fff;
   border-top: 1px solid rgba(255,255,255,.06);
 }
-.trust__inner {
+.trust__viewport {
+  overflow: hidden;
+  padding: var(--space-5) 0;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+}
+.trust__track {
+  display: flex;
+  width: max-content;
+  animation: trust-marquee 26s linear infinite;
+  will-change: transform;
+}
+.trust__track:hover { animation-play-state: paused; }
+.trust__group {
   display: flex;
   gap: var(--space-3);
-  padding: var(--space-5);
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+  padding: 0 var(--space-3);
+  flex-shrink: 0;
 }
-.trust__inner::-webkit-scrollbar { display: none; }
-
 .trust__item {
   display: flex;
   align-items: center;
   gap: var(--space-3);
   flex: 0 0 auto;
-  max-width: 280px;
+  width: max(240px, 72vw);
+  max-width: 300px;
   padding: var(--space-3) var(--space-4);
   background: rgba(255,255,255,.05);
   border: 1px solid rgba(255,255,255,.08);
@@ -624,15 +634,47 @@ ul { margin: 0; padding: 0; list-style: none; }
 .trust__item svg { color: var(--lime); flex: none; width: 22px; height: 22px; }
 .trust__item p { margin: 0; color: rgba(255,255,255,.9); }
 
+@keyframes trust-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trust__track { animation: none; }
+  .trust__viewport {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+}
+
 @media (min-width: 768px) {
-  .trust__inner {
+  .trust__viewport {
+    overflow: visible;
+    mask-image: none;
+    -webkit-mask-image: none;
+    padding: var(--space-6) var(--space-5);
+    max-width: var(--container);
+    margin: 0 auto;
+  }
+  .trust__track {
+    animation: none;
+    width: 100%;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    overflow: visible;
     gap: var(--space-4);
-    padding: var(--space-6) var(--space-5);
+    transform: none !important;
+    will-change: auto;
   }
-  .trust__item { max-width: none; }
+  .trust__group {
+    display: contents;
+  }
+  .trust__group--clone { display: none; }
+  .trust__item {
+    width: auto;
+    max-width: none;
+  }
 }
 
 /* ===================== SECTIONS ===================== */

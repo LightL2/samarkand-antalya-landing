@@ -325,6 +325,17 @@
     officeMapLoad.addEventListener("click", loadOfficeMap);
   }
 
+  /* ---------- trust marquee ---------- */
+  var trustTrack = $("#trustTrack");
+  var trustGroup = $("#trustGroup");
+  if (trustTrack && trustGroup) {
+    var trustClone = trustGroup.cloneNode(true);
+    trustClone.removeAttribute("id");
+    trustClone.classList.add("trust__group--clone");
+    trustClone.setAttribute("aria-hidden", "true");
+    trustTrack.appendChild(trustClone);
+  }
+
   /* ---------- init ---------- */
   applyLang(lang);
   if (!savedLang) openLangModal();
