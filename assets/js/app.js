@@ -27,9 +27,28 @@
   }
 
   function lockBody(lock) {
-    document.body.style.overflow = lock ? "hidden" : "";
-    document.body.classList.toggle("modal-open", lock);
+    if (lock) {
+      scrollLockPos = window.scrollY || window.pageYOffset || 0;
+      document.body.style.overflow = "hidden";
+      document.body.style.position = "fixed";
+      document.body.style.top = "-" + scrollLockPos + "px";
+      document.body.style.left = "0";
+      document.body.style.right = "0";
+      document.body.style.width = "100%";
+      document.body.classList.add("modal-open");
+    } else {
+      document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      document.body.style.width = "";
+      document.body.classList.remove("modal-open");
+      window.scrollTo(0, scrollLockPos);
+    }
   }
+
+  var scrollLockPos = 0;
 
   function applyLang(l) {
     lang = (l === "uz") ? "uz" : "ru";
@@ -67,6 +86,7 @@
     if (!langModal) return;
     langModal.hidden = false;
     lockBody(true);
+    updateFabVisibility();
   }
 
   function closeLangModal() {
@@ -74,6 +94,7 @@
     langModal.hidden = true;
     lockBody(false);
     document.documentElement.classList.remove("lang-pending");
+    updateFabVisibility();
   }
 
   function pickLang(l) {
@@ -112,7 +133,17 @@
     menuBackdrop.addEventListener("click", function () { toggleMenu(false); });
   }
 
-  /* ---------- mobile sticky CTA ---------- */
+  /* ---------- mobile FAB visibility ---------- */
+  var fabs = $$(".fab");
+  function updateFabVisibility() {
+    var langOpen = langModal && !langModal.hidden;
+    var hide = langOpen || window.scrollY < window.innerHeight * 0.45;
+    fabs.forEach(function (fab) {
+      fab.classList.toggle("is-hidden", hide);
+    });
+  }
+  window.addEventListener("scroll", updateFabVisibility, { passive: true });
+  updateFabVisibility();
   var mobCta = $("#mobCta");
   var leadSection = $("#lead");
   if (mobCta && leadSection && "IntersectionObserver" in window) {
