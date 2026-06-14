@@ -111,7 +111,7 @@
           <span data-i18n="hero.title1">Прямые рейсы</span>
           <span class="hero__route">
             <span data-i18n="hero.from">Самарканд</span>
-            <svg class="hero__plane" viewBox="0 0 24 24" width="34" height="34" aria-hidden="true"><path fill="currentColor" d="M2.5 12.5 21 4l-6 17-3.5-6.5L2.5 12.5Z"/></svg>
+            <svg class="hero__plane" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M2.5 12.5 21 4l-6 17-3.5-6.5L2.5 12.5Z"/></svg>
             <span data-i18n="hero.to">Анталья</span>
           </span>
         </h1>
@@ -425,14 +425,22 @@
       </div>
 
       <div class="office">
-        <div class="office__map">
-          <iframe
-            src="https://yandex.uz/map-widget/v1/?ll=66.937861%2C39.665842&z=19&l=map&pt=66.937604%2C39.665908%2Cpm2rdm"
-            title="Asialuxe Travel на карте"
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-            allowfullscreen
-          ></iframe>
+        <div class="office__map" id="officeMap">
+          <button type="button" class="office__map-preview" id="officeMapLoad" aria-label="Показать карту">
+            <img
+              class="office__map-static"
+              src="https://static-maps.yandex.ru/1.x/?ll=66.937604%2C39.665908&size=650%2C360&z=16&l=map&pt=66.937604%2C39.665908%2Cpm2rdm"
+              alt=""
+              loading="lazy"
+              decoding="async"
+              width="650"
+              height="360"
+            />
+            <span class="office__map-overlay">
+              <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 2a8 8 0 0 0-8 8c0 5.4 8 12 8 12s8-6.6 8-12a8 8 0 0 0-8-8Zm0 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z"/></svg>
+              <span data-i18n="office.showMap">Показать интерактивную карту</span>
+            </span>
+          </button>
         </div>
 
         <div class="office__card">

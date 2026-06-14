@@ -120,6 +120,7 @@ window.I18N = {
     "office.type": "Офис продаж · Самарканд",
     "office.addr": "г. Самарканд, ул. Гагарина, 81",
     "office.cta": "Построить маршрут",
+    "office.showMap": "Показать интерактивную карту",
 
     "mob.price": "от 10,1 млн сум · 7 ночей",
     "mob.cta": "Забронировать тур",
@@ -255,6 +256,7 @@ window.I18N = {
     "office.type": "Savdo ofisi · Samarqand",
     "office.addr": "Samarqand sh., Gagarin koʻchasi, 81",
     "office.cta": "Marshrut tuzish",
+    "office.showMap": "Interaktiv xaritani ko'rsatish",
 
     "mob.price": "10,1 mln soʻmdan · 7 kecha",
     "mob.cta": "Turni band qilish",

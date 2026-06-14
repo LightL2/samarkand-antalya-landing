@@ -137,7 +137,8 @@
   var fabs = $$(".fab");
   function updateFabVisibility() {
     var langOpen = langModal && !langModal.hidden;
-    var hide = langOpen || window.scrollY < window.innerHeight * 0.45;
+    var mobVisible = mobCta && mobCta.classList.contains("is-visible");
+    var hide = langOpen || mobVisible || window.scrollY < window.innerHeight * 0.45;
     fabs.forEach(function (fab) {
       fab.classList.toggle("is-hidden", hide);
     });
@@ -153,6 +154,7 @@
       var show = pastHero && !leadVisible;
       mobCta.classList.toggle("is-visible", show);
       mobCta.setAttribute("aria-hidden", String(!show));
+      updateFabVisibility();
     }, { threshold: 0.05 });
     ctaIo.observe(leadSection);
     window.addEventListener("scroll", function () {
@@ -160,6 +162,7 @@
         mobCta.classList.remove("is-visible");
         mobCta.setAttribute("aria-hidden", "true");
       }
+      updateFabVisibility();
     }, { passive: true });
   } else if (mobCta) {
     mobCta.classList.add("is-visible");
@@ -300,6 +303,26 @@
       'lang': lang,
       'page': 'samarkand-antalya'
     });
+  }
+
+  /* ---------- office map (lazy) ---------- */
+  var officeMap = $("#officeMap");
+  var officeMapLoad = $("#officeMapLoad");
+  var MAP_EMBED = "https://yandex.uz/map-widget/v1/?ll=66.937861%2C39.665842&z=19&l=map&pt=66.937604%2C39.665908%2Cpm2rdm";
+
+  function loadOfficeMap() {
+    if (!officeMap || officeMap.classList.contains("is-loaded")) return;
+    var iframe = document.createElement("iframe");
+    iframe.src = MAP_EMBED;
+    iframe.title = "Asialuxe Travel на карте";
+    iframe.setAttribute("referrerpolicy", "no-referrer-when-downgrade");
+    iframe.setAttribute("allowfullscreen", "");
+    officeMap.appendChild(iframe);
+    officeMap.classList.add("is-loaded");
+  }
+
+  if (officeMapLoad) {
+    officeMapLoad.addEventListener("click", loadOfficeMap);
   }
 
   /* ---------- init ---------- */
