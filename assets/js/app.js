@@ -296,6 +296,13 @@
       'value': 1.0,
       'currency': 'USD'
     });
+    // GA4 qualify_lead
+    gtag('event', 'qualify_lead', {
+      'currency': 'USD',
+      'value': 1.0,
+      'lang': lang,
+      'page': 'samarkand-antalya'
+    });
     // GA4 generate_lead
     gtag('event', 'generate_lead', {
       'currency': 'USD',
