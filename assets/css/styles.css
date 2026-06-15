@@ -1480,7 +1480,7 @@ ul { margin: 0; padding: 0; list-style: none; }
   font-size: 14px;
   flex-shrink: 0;
 }
-.lang-modal__btn[data-pick-lang="uz"] .lang-modal__code {
+.lang-modal__btn[data-pick-lang="ru"] .lang-modal__code {
   background: var(--blue);
 }
 
