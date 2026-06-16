@@ -20,7 +20,7 @@ window.I18N = {
     "hero.lead": "Прямые рейсы каждый четверг — к морю без пересадок и поездки в Ташкент.",
     "hero.ctaTour": "Забронировать тур",
     "hero.ctaInfo": "Что входит",
-    "hero.stat1n": "от 10,1 млн",
+    "hero.stat1n": "от 8,8 млн",
     "hero.stat1l": "сум на человека",
     "hero.stat2n": "7 ночей",
     "hero.stat2l": "у моря",
@@ -104,7 +104,7 @@ window.I18N = {
     "faq.q2": "Что входит в тур?",
     "faq.a2": "Перелёт, 7 ночей в отеле, питание, трансфер и страховка. Цена — на человека при двухместном размещении.",
     "faq.q3": "Сколько стоит?",
-    "faq.a3": "От 10,1 млн сум на человека за 7 ночей. Точная цена зависит от отеля — оставьте заявку, рассчитаем бесплатно.",
+    "faq.a3": "От 8,8 млн сум на человека за 7 ночей. Точная цена зависит от отеля — оставьте заявку, рассчитаем бесплатно.",
     "faq.q4": "Как забронировать?",
     "faq.a4": "Заявка на сайте, звонок (71) 201 77 77 или офис Asialuxe Travel.",
     "faq.q5": "Подходит для семей с детьми?",
@@ -124,7 +124,7 @@ window.I18N = {
 
     "lang.main": "Выбранный",
 
-    "mob.price": "от 10,1 млн сум на чел. · 7 ночей",
+    "mob.price": "от 8,8 млн сум на чел. · 7 ночей",
     "mob.cta": "Забронировать тур",
 
     "footer.about": "Asialuxe Travel — прямые рейсы Самарканд — Анталья.",
@@ -138,6 +138,10 @@ window.I18N = {
 
     "msg.error": "Не удалось отправить. Проверьте подключение и попробуйте ещё раз.",
     "msg.validate": "Заполните имя и телефон.",
+    "msg.validateName": "Укажите имя и фамилию буквами (без цифр и символов).",
+    "msg.validatePhone": "Укажите корректный номер Узбекистана: +998 XX XXX XX XX.",
+    "msg.validateComment": "Комментарий слишком длинный или содержит недопустимые символы.",
+    "msg.captcha": "Подтвердите, что вы не робот.",
     "msg.sending": "Отправляем…"
   },
 
@@ -158,7 +162,7 @@ window.I18N = {
     "hero.lead": "Har payshanba toʻgʻridan-toʻgʻri reys — transitsiz va Toshkentga bormasdan dengizga.",
     "hero.ctaTour": "Turni band qilish",
     "hero.ctaInfo": "Nimalar kiradi",
-    "hero.stat1n": "10,1 mln dan",
+    "hero.stat1n": "8,8 mln dan",
     "hero.stat1l": "soʻm kishi boshiga",
     "hero.stat2n": "7 kecha",
     "hero.stat2l": "dengiz boʻyida",
@@ -242,7 +246,7 @@ window.I18N = {
     "faq.q2": "Turga nimalar kiradi?",
     "faq.a2": "Parvoz, 7 kecha mehmonxona, ovqatlanish, transfer va sugʻurta. Narx kishi boshiga — ikki kishilik xonada.",
     "faq.q3": "Qancha turadi?",
-    "faq.a3": "7 kecha — kishi boshiga 10,1 mln soʻmdan. Aniq narx mehmonxonaga bogʻliq — ariza qoldiring, bepul hisoblab beramiz.",
+    "faq.a3": "7 kecha — kishi boshiga 8,8 mln soʻmdan. Aniq narx mehmonxonaga bogʻliq — ariza qoldiring, bepul hisoblab beramiz.",
     "faq.q4": "Qanday band qilish?",
     "faq.a4": "Saytda ariza, (71) 201 77 77 qoʻngʻiroq yoki Asialuxe Travel ofisi.",
     "faq.q5": "Bolali oilalar uchun mosmi?",
@@ -262,7 +266,7 @@ window.I18N = {
 
     "lang.main": "Tanlangan",
 
-    "mob.price": "10,1 mln soʻmdan · kishi boshiga · 7 kecha",
+    "mob.price": "8,8 mln soʻmdan · kishi boshiga · 7 kecha",
     "mob.cta": "Turni band qilish",
 
     "footer.about": "Asialuxe Travel — Samarqand — Antalya toʻgʻridan-toʻgʻri reyslari.",
@@ -276,6 +280,10 @@ window.I18N = {
 
     "msg.error": "Yuborib boʻlmadi. Internetni tekshirib, qayta urinib koʻring.",
     "msg.validate": "Ism va telefonni kiriting.",
+    "msg.validateName": "Ism-familiyani harflar bilan yozing (raqam va belgilarsiz).",
+    "msg.validatePhone": "Oʻzbekiston raqamini toʻgʻri kiriting: +998 XX XXX XX XX.",
+    "msg.validateComment": "Izoh juda uzun yoki notoʻgʻri belgilar bor.",
+    "msg.captcha": "Robot emasligingizni tasdiqlang.",
     "msg.sending": "Yuborilmoqda…"
   }
 };

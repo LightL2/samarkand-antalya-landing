@@ -10,4 +10,8 @@ return [
     // ID чата/группы для заявок. Узнать chat_id: напишите боту, затем откройте
     // https://api.telegram.org/bot<TOKEN>/getUpdates и возьмите chat.id
     'telegram_chat_id' => 'PASTE_YOUR_CHAT_ID_HERE',
+
+    // Cloudflare Turnstile (https://dash.cloudflare.com → Turnstile)
+    // Публичный ключ — в assets/js/app.js → CONFIG.TURNSTILE_SITE_KEY
+    'turnstile_secret_key' => '',
 ];

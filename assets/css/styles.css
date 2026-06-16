@@ -975,7 +975,9 @@ ul { margin: 0; padding: 0; list-style: none; }
   background: #fff;
   box-shadow: 0 0 0 4px rgba(0,115,255,.12);
 }
-.field input.is-invalid {
+.field input.is-invalid,
+.field textarea.is-invalid,
+.field select.is-invalid {
   border-color: var(--red);
   box-shadow: 0 0 0 4px rgba(217,4,61,.1);
 }
@@ -1021,6 +1023,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .chip input:focus-visible + span { outline: 3px solid var(--lime); outline-offset: 2px; }
 
 .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.turnstile-field { display: flex; justify-content: center; margin-bottom: var(--space-4); }
 .lead__policy { color: var(--gray-400); font-size: 11px; text-align: center; margin: var(--space-3) 0 0; line-height: 1.45; }
 .form-msg { margin-top: var(--space-3); padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; }
 .form-msg.is-error { background: rgba(217,4,61,.08); color: var(--red); }

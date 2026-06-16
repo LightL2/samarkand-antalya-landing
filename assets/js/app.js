@@ -12,7 +12,8 @@
     LEAD_ENDPOINT: "lead.php",
     GADS_CONVERSION: "AW-18224907931/aHBPCMqxxrscEJuNqPJD", // send_to для конверсии
     MIN_FILL_MS: 2500, // антибот: форма не может быть отправлена быстрее
-    LANG_MODAL_DELAY_MS: 3000 // поп-ап языка — после прогрузки страницы
+    LANG_MODAL_DELAY_MS: 3000, // поп-ап языка — после прогрузки страницы
+    TURNSTILE_SITE_KEY: "" // Cloudflare Turnstile — публичный ключ (см. config.example.php)
   };
 
   var $  = function (s, c) { return (c || document).querySelector(s); };
@@ -211,31 +212,119 @@
     msg.className = "form-msg " + (type === "ok" ? "is-ok" : "is-error");
   }
 
-  function validate() {
+  function isValidName(v) {
+    v = v.trim();
+    if (v.length < 3 || v.length > 80) return false;
+    if (/\d/.test(v)) return false;
+    if (/[#*@$%^&_=+\[\]{}|\\<>~`]/.test(v)) return false;
+    if (/(.)\1{4,}/u.test(v)) return false;
+    return (v.match(/\p{L}/gu) || []).length >= 2;
+  }
+
+  var UZ_OPS = ["90","91","93","94","95","97","98","99","33","50","88","77","20","71"];
+
+  function isValidUzPhone(v) {
+    var d = v.replace(/\D/g, "");
+    if (!d || d.length > 12) return false;
+    if (d.length === 9) d = "998" + d;
+    if (d.length !== 12 || d.slice(0, 3) !== "998") return false;
+    return UZ_OPS.indexOf(d.slice(3, 5)) !== -1;
+  }
+
+  function isValidComment(v) {
+    v = v.trim();
+    if (!v) return true;
+    if (v.length > 500) return false;
+    if (/(.)\1{6,}/.test(v)) return false;
+    return (v.match(/\./g) || []).length <= v.length * 0.25;
+  }
+
+  function validateForm() {
     var ok = true;
-    var name = $("#f-name"), phone = $("#f-phone");
-    [name, phone].forEach(function (f) {
-      var bad = !f.value.trim() || (f === phone && f.value.replace(/\D/g, "").length < 7);
-      f.classList.toggle("is-invalid", bad);
-      if (bad) ok = false;
-    });
+    var nameEl = $("#f-name");
+    var phoneEl = $("#f-phone");
+    var commentEl = $("#f-comment");
+    var nameBad = !isValidName(nameEl.value);
+    var phoneBad = !isValidUzPhone(phoneEl.value);
+    var commentBad = commentEl && !isValidComment(commentEl.value);
+
+    nameEl.classList.toggle("is-invalid", nameBad);
+    phoneEl.classList.toggle("is-invalid", phoneBad);
+    if (commentEl) commentEl.classList.toggle("is-invalid", commentBad);
+
+    if (nameBad) {
+      showMsg(t("msg.validateName"), "error");
+      ok = false;
+    } else if (phoneBad) {
+      showMsg(t("msg.validatePhone"), "error");
+      ok = false;
+    } else if (commentBad) {
+      showMsg(t("msg.validateComment"), "error");
+      ok = false;
+    }
     return ok;
   }
 
+  function initTurnstile() {
+    if (!CONFIG.TURNSTILE_SITE_KEY) return;
+    var field = $("#turnstileField");
+    var box = $("#turnstileBox");
+    if (!field || !box) return;
+    field.hidden = false;
+
+    var s = document.createElement("script");
+    s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+    s.async = true;
+    s.onload = function () {
+      if (!window.turnstile) return;
+      var widgetId = window.turnstile.render(box, {
+        sitekey: CONFIG.TURNSTILE_SITE_KEY,
+        theme: "light"
+      });
+      box.setAttribute("data-widget-id", widgetId);
+    };
+    document.head.appendChild(s);
+  }
+
+  function getTurnstileToken() {
+    var el = form && form.querySelector('input[name="cf-turnstile-response"]');
+    return el ? el.value : "";
+  }
+
+  function resetTurnstile() {
+    if (!window.turnstile || !CONFIG.TURNSTILE_SITE_KEY) return;
+    var box = $("#turnstileBox");
+    if (!box) return;
+    var id = box.getAttribute("data-widget-id");
+    if (id) window.turnstile.reset(id);
+  }
+
   if (form) {
+    var phoneEl = $("#f-phone");
+    if (phoneEl) {
+      phoneEl.addEventListener("input", function () {
+        this.value = this.value.replace(/[^\d+\s()-]/g, "");
+      });
+    }
+
     form.addEventListener("submit", function (e) {
       e.preventDefault();
       if (msg) msg.hidden = true;
 
       // honeypot
-      if (form.website && form.website.value) { return; }
+      if ((form.website && form.website.value) || (form.company && form.company.value)) { return; }
       // timing trap
       var elapsed = Date.now() - parseInt(tsField.value || "0", 10);
       if (elapsed < CONFIG.MIN_FILL_MS) {
         showMsg(t("msg.error"), "error");
         return;
       }
-      if (!validate()) { showMsg(t("msg.validate"), "error"); return; }
+      if (!validateForm()) { return; }
+
+      if (CONFIG.TURNSTILE_SITE_KEY && !getTurnstileToken()) {
+        showMsg(t("msg.captcha"), "error");
+        return;
+      }
 
       var data = {
         name: form.name.value.trim(),
@@ -251,7 +340,8 @@
         url: location.href,
         ref: document.referrer || "",
         ua: navigator.userAgent,
-        elapsed: elapsed
+        elapsed: elapsed,
+        turnstile: getTurnstileToken()
       };
 
       submitBtn.disabled = true;
@@ -262,6 +352,7 @@
         .then(function () {
           form.reset();
           tsField.value = String(Date.now());
+          resetTurnstile();
           fireConversion();
           openModal();
         })
@@ -347,6 +438,7 @@
 
   /* ---------- init ---------- */
   applyLang(lang);
+  initTurnstile();
   if (!savedLang) {
     setTimeout(openLangModal, CONFIG.LANG_MODAL_DELAY_MS);
   }

@@ -20,9 +20,10 @@ $cfg = is_file(__DIR__ . '/config.php') ? require __DIR__ . '/config.php' : [];
 
 define('TELEGRAM_TOKEN',   $cfg['telegram_token']   ?? '');
 define('TELEGRAM_CHAT_ID', $cfg['telegram_chat_id'] ?? '');
+define('TURNSTILE_SECRET', $cfg['turnstile_secret_key'] ?? '');
 const CSV_FILE       = __DIR__ . '/leads.csv';
-const MIN_FILL_MS    = 2000;            // антибот: быстрее этого = бот
-const RATE_LIMIT_SEC = 30;              // не чаще 1 заявки с IP за это время
+const MIN_FILL_MS    = 2500;            // антибот: быстрее этого = бот
+const RATE_LIMIT_SEC = 45;              // не чаще 1 заявки с IP за это время
 // ======================================
 
 header('Content-Type: application/json; charset=utf-8');
@@ -53,23 +54,32 @@ $d = json_decode($raw, true);
 if (!is_array($d)) { $d = $_POST; }
 
 // --- анти-бот: honeypot ---
-if (!empty($d['website'])) { out(['ok' => true]); } // тихо игнорируем бота
+if (!empty($d['website']) || !empty($d['company'])) { out(['ok' => true]); }
+
+// --- анти-бот: Cloudflare Turnstile (если ключ задан в config.php) ---
+if (TURNSTILE_SECRET !== '') {
+    $tsToken = trim((string)($d['turnstile'] ?? ''));
+    if ($tsToken === '' || !verify_turnstile($tsToken, TURNSTILE_SECRET)) {
+        out(['ok' => true]);
+    }
+}
 
 // --- анти-бот: тайминг ---
 if (isset($d['elapsed']) && (int)$d['elapsed'] < MIN_FILL_MS) {
-    out(['ok' => false, 'error' => 'too_fast'], 422);
+    out(['ok' => true]);
 }
 
 // --- валидация ---
-$name  = trim((string)($d['name'] ?? ''));
-$phone = trim((string)($d['phone'] ?? ''));
-$digits = preg_replace('/\D/', '', $phone);
-if ($name === '' || strlen($digits) < 7) {
-    out(['ok' => false, 'error' => 'invalid'], 422);
+$name    = trim((string)($d['name'] ?? ''));
+$phone   = trim((string)($d['phone'] ?? ''));
+$comment = trim((string)($d['comment'] ?? ''));
+$phoneNorm = normalize_uz_phone($phone);
+
+if (!is_valid_name($name) || $phoneNorm === null || !is_valid_comment($comment)) {
+    out(['ok' => true]); // тихо отбрасываем мусорные заявки
 }
-if (mb_strlen($name) > 120 || strlen($phone) > 40) {
-    out(['ok' => false, 'error' => 'too_long'], 422);
-}
+
+$phone = $phoneNorm;
 
 // --- анти-бот: rate-limit по IP (через temp-файл) ---
 $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
@@ -108,6 +118,71 @@ out(['ok' => true]);
 
 
 // ===================== функции =====================
+
+function is_valid_name(string $name): bool {
+    if (mb_strlen($name) < 3 || mb_strlen($name) > 80) { return false; }
+    if (!preg_match('/\p{L}/u', $name)) { return false; }
+    if (preg_match('/\d/u', $name)) { return false; }
+    if (preg_match('/[#*@$%^&_=+\[\]{}|\\<>~`]/u', $name)) { return false; }
+    if (preg_match('/(.)\1{4,}/u', $name)) { return false; }
+    return preg_match_all('/\p{L}/u', $name) >= 2;
+}
+
+function normalize_uz_phone(string $phone): ?string {
+    $digits = preg_replace('/\D/', '', $phone);
+    if ($digits === '' || strlen($digits) > 12) { return null; }
+    if (strlen($digits) === 9) { $digits = '998' . $digits; }
+    if (strlen($digits) !== 12 || substr($digits, 0, 3) !== '998') { return null; }
+    $op = substr($digits, 3, 2);
+    $ops = ['90','91','93','94','95','97','98','99','33','50','88','77','20','71'];
+    if (!in_array($op, $ops, true)) { return null; }
+    return '+998 ' . substr($digits, 3, 2) . ' ' . substr($digits, 5, 3) . ' '
+        . substr($digits, 8, 2) . ' ' . substr($digits, 10, 2);
+}
+
+function is_valid_comment(string $comment): bool {
+    if ($comment === '') { return true; }
+    if (mb_strlen($comment) > 500) { return false; }
+    if (preg_match('/(.)\1{6,}/u', $comment)) { return false; }
+    if (substr_count($comment, '.') > (int)(mb_strlen($comment) * 0.25)) { return false; }
+    return true;
+}
+
+function verify_turnstile(string $token, string $secret): bool {
+    $payload = http_build_query([
+        'secret'   => $secret,
+        'response' => $token,
+        'remoteip' => $_SERVER['REMOTE_ADDR'] ?? '',
+    ]);
+    $url = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+    $raw = false;
+
+    if (function_exists('curl_init')) {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST           => true,
+            CURLOPT_HTTPHEADER     => ['Content-Type: application/x-www-form-urlencoded'],
+            CURLOPT_POSTFIELDS     => $payload,
+            CURLOPT_TIMEOUT        => 8,
+        ]);
+        $raw = curl_exec($ch);
+        curl_close($ch);
+    } else {
+        $raw = @file_get_contents($url, false, stream_context_create([
+            'http' => [
+                'method'  => 'POST',
+                'header'  => "Content-Type: application/x-www-form-urlencoded\r\n",
+                'content' => $payload,
+                'timeout' => 8,
+            ],
+        ]));
+    }
+
+    if (!$raw) { return false; }
+    $res = json_decode($raw, true);
+    return is_array($res) && !empty($res['success']);
+}
 
 function save_csv(array $lead): void {
     $headers = ['Дата','Имя','Телефон','Связь','Взрослых','Детей','Класс','Трансфер','Комментарий','Язык','Страница','URL','Referrer'];
