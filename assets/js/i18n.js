@@ -122,7 +122,7 @@ window.I18N = {
     "office.cta": "Построить маршрут",
     "office.showMap": "Показать интерактивную карту",
 
-    "lang.main": "Основной",
+    "lang.main": "Выбранный",
 
     "mob.price": "от 10,1 млн сум на чел. · 7 ночей",
     "mob.cta": "Забронировать тур",
@@ -260,7 +260,7 @@ window.I18N = {
     "office.cta": "Marshrut tuzish",
     "office.showMap": "Interaktiv xaritani ko'rsatish",
 
-    "lang.main": "Asosiy til",
+    "lang.main": "Tanlangan",
 
     "mob.price": "10,1 mln soʻmdan · kishi boshiga · 7 kecha",
     "mob.cta": "Turni band qilish",

@@ -1408,7 +1408,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 }
 .lang-modal__title {
   font-size: clamp(20px, 5vw, 24px);
-  margin-bottom: 4px;
+  margin-bottom: var(--space-6);
 }
 .lang-modal__sub {
   color: var(--gray-400);

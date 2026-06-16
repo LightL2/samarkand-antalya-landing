@@ -11,7 +11,8 @@
   var CONFIG = {
     LEAD_ENDPOINT: "lead.php",
     GADS_CONVERSION: "AW-18224907931/aHBPCMqxxrscEJuNqPJD", // send_to для конверсии
-    MIN_FILL_MS: 2500 // антибот: форма не может быть отправлена быстрее
+    MIN_FILL_MS: 2500, // антибот: форма не может быть отправлена быстрее
+    LANG_MODAL_DELAY_MS: 3000 // поп-ап языка — после прогрузки страницы
   };
 
   var $  = function (s, c) { return (c || document).querySelector(s); };
@@ -84,6 +85,7 @@
 
   function openLangModal() {
     if (!langModal) return;
+    document.documentElement.classList.add("lang-pending");
     langModal.hidden = false;
     lockBody(true);
     updateFabVisibility();
@@ -345,5 +347,7 @@
 
   /* ---------- init ---------- */
   applyLang(lang);
-  if (!savedLang) openLangModal();
+  if (!savedLang) {
+    setTimeout(openLangModal, CONFIG.LANG_MODAL_DELAY_MS);
+  }
 })();

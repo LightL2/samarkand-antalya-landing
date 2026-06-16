@@ -43,14 +43,6 @@
 
   <link rel="stylesheet" href="assets/css/styles.css" />
 
-  <script>
-    (function () {
-      if (!localStorage.getItem("al_lang")) {
-        document.documentElement.classList.add("lang-pending");
-      }
-    })();
-  </script>
-
   <!-- ============================================================= -->
   <!-- Google tag (gtag.js) — GA4 + Google Ads                       -->
   <!-- ============================================================= -->
@@ -561,21 +553,20 @@
   <!-- language picker (first visit) -->
   <div class="modal modal--lang" id="langModal" hidden>
     <div class="modal__backdrop"></div>
-    <div class="modal__box modal__box--lang" role="dialog" aria-modal="true" aria-labelledby="langModalTitle">
+    <div class="modal__box modal__box--lang" role="dialog" aria-modal="true" aria-labelledby="langModalTitle" lang="ru">
       <img src="assets/img/asialuxe-favicon.png" alt="Asialuxe Travel" class="lang-modal__logo" width="140" height="44" />
       <h3 id="langModalTitle" class="lang-modal__title">Выберите язык</h3>
-      <p class="lang-modal__sub">Tilni tanlang</p>
       <div class="lang-modal__choices">
+        <button type="button" class="lang-modal__btn" data-pick-lang="uz">
+          <span class="lang-modal__code">UZ</span>
+          <span class="lang-modal__name">Узбекский</span>
+        </button>
         <button type="button" class="lang-modal__btn lang-modal__btn--primary" data-pick-lang="ru">
           <span class="lang-modal__code">RU</span>
           <span class="lang-modal__name">
             Русский
-            <small data-i18n="lang.main">Основной</small>
+            <small>Выбранный</small>
           </span>
-        </button>
-        <button type="button" class="lang-modal__btn" data-pick-lang="uz">
-          <span class="lang-modal__code">UZ</span>
-          <span class="lang-modal__name">O'zbekcha</span>
         </button>
       </div>
     </div>
