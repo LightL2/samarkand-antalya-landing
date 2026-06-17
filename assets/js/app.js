@@ -381,6 +381,32 @@
   }
 
   /* ---------- analytics ---------- */
+  function trackCallClick(place) {
+    if (typeof gtag !== "function") return;
+    gtag("event", "click_call", {
+      lang: lang,
+      page: "samarkand-antalya",
+      call_place: place || "other"
+    });
+  }
+
+  function getCallPlace(link) {
+    if (link.classList.contains("header__phone")) return "header";
+    if (link.classList.contains("fab--call")) return "fab";
+    if (link.closest(".lead")) return "lead";
+    if (link.closest(".office")) return "office";
+    if (link.closest(".footer")) return "footer";
+    return "other";
+  }
+
+  function initCallTracking() {
+    document.addEventListener("click", function (e) {
+      var link = e.target.closest('a[href^="tel:"]');
+      if (!link) return;
+      trackCallClick(getCallPlace(link));
+    });
+  }
+
   function fireConversion() {
     if (typeof gtag !== "function") return;
     // Google Ads conversion (Отправка формы для потенциальных клиентов)
@@ -438,6 +464,7 @@
 
   /* ---------- init ---------- */
   applyLang(lang);
+  initCallTracking();
   initTurnstile();
   if (!savedLang) {
     setTimeout(openLangModal, CONFIG.LANG_MODAL_DELAY_MS);
