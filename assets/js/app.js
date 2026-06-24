@@ -173,7 +173,7 @@
   }
 
   /* ---------- reveal on scroll ---------- */
-  var revealEls = $$(".card, .why__text, .why__media, .route, .faq__item, .pricecard, .section__head, .trust__item, .office");
+  var revealEls = $$(".card, .why__text, .why__media, .premium__text, .premium__media, .route, .faq__item, .pricecard, .section__head, .trust__item, .office");
   revealEls.forEach(function (el) { el.classList.add("reveal"); });
   if ("IntersectionObserver" in window) {
     var io = new IntersectionObserver(function (entries) {

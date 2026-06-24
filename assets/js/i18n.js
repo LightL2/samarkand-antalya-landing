@@ -74,6 +74,16 @@ window.I18N = {
     "schedule.day": "каждый четверг",
     "schedule.airline": "Uzbekistan Airways",
 
+    "premium.eyebrow": "Спецпредложение",
+    "premium.tag": "Акция · июль",
+    "premium.title": "Премиальные отели Антальи с апгрейдом до бизнес-класса",
+    "premium.lead": "Весь июль: при бронировании от 7 ночей — бизнес-класс в подарок при наличии мест. Прямой вылет из Самарканда.",
+    "premium.l1": "Regnum The Crown, Maxx Royal Belek, Maxx Royal Kemer, NG Phaselis Bay, Cullinan Belek",
+    "premium.l2": "Апгрейд в одну сторону · только новые брони",
+    "premium.l3": "Беспроцентная рассрочка на 6 месяцев",
+    "premium.note": "Апгрейд при наличии мест. Условия уточняйте у менеджера.",
+    "premium.cta": "Получить расчёт",
+
     "form.eyebrow": "Заявка",
     "form.title": "Рассчитаем тур бесплатно",
     "form.sub": "Подберём вариант под ваш бюджет и даты.",
@@ -215,6 +225,16 @@ window.I18N = {
     "schedule.to": "Antalya",
     "schedule.day": "har payshanba",
     "schedule.airline": "Uzbekistan Airways",
+
+    "premium.eyebrow": "Maxsus taklif",
+    "premium.tag": "Aksiya · iyul",
+    "premium.title": "Antalya premium mehmonxonalari + biznes-klassga upgrade",
+    "premium.lead": "Butun iyul: 7 kechadan bron qilsangiz — joy boʻlsa biznes-klass sovgʻa. Samarqandan toʻgʻri parvoz.",
+    "premium.l1": "Regnum The Crown, Maxx Royal Belek, Maxx Royal Kemer, NG Phaselis Bay, Cullinan Belek",
+    "premium.l2": "Bir tomonga upgrade · faqat yangi bronlar",
+    "premium.l3": "6 oyga foizsiz muddatli toʻlov",
+    "premium.note": "Upgrade joy boʻlganda. Shartlarni menejerdan aniqlang.",
+    "premium.cta": "Hisob-kitob olish",
 
     "form.eyebrow": "Ariza",
     "form.title": "Turni bepul hisoblab beramiz",
