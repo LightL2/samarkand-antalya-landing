@@ -13,8 +13,11 @@
     GADS_CONVERSION: "AW-18224907931/aHBPCMqxxrscEJuNqPJD", // send_to для конверсии
     MIN_FILL_MS: 2500, // антибот: форма не может быть отправлена быстрее
     LANG_MODAL_DELAY_MS: 3000, // поп-ап языка — после прогрузки страницы
-    TURNSTILE_SITE_KEY: "" // Cloudflare Turnstile — публичный ключ (см. config.example.php)
+    TURNSTILE_SITE_KEY: "", // Cloudflare Turnstile — публичный ключ (см. config.example.php)
+    UTM_STORAGE_KEY: "al_utm"
   };
+
+  var UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
 
   var $  = function (s, c) { return (c || document).querySelector(s); };
   var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
@@ -26,6 +29,57 @@
 
   function t(key) {
     return (dict[lang] && dict[lang][key]) || (dict.ru && dict.ru[key]) || key;
+  }
+
+  /* ---------- UTM (сохраняем метки первого визита) ---------- */
+  function initUtm() {
+    var params = new URLSearchParams(location.search);
+    var utm = {};
+    var hasNew = false;
+    UTM_KEYS.forEach(function (key) {
+      var val = params.get(key);
+      if (val) {
+        utm[key] = val.slice(0, 120);
+        hasNew = true;
+      }
+    });
+    if (hasNew) {
+      try { sessionStorage.setItem(CONFIG.UTM_STORAGE_KEY, JSON.stringify(utm)); } catch (e) {}
+    }
+  }
+
+  function getUtm() {
+    try {
+      var raw = sessionStorage.getItem(CONFIG.UTM_STORAGE_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function getAnalyticsParams(extra) {
+    var utm = getUtm();
+    var data = {
+      lang: lang,
+      page: "samarkand-antalya"
+    };
+    if (utm.utm_source) data.source = utm.utm_source;
+    if (utm.utm_medium) data.medium = utm.utm_medium;
+    if (utm.utm_campaign) data.campaign = utm.utm_campaign;
+    if (utm.utm_content) data.content = utm.utm_content;
+    if (utm.utm_term) data.term = utm.utm_term;
+    if (extra) {
+      Object.keys(extra).forEach(function (k) { data[k] = extra[k]; });
+    }
+    return data;
+  }
+
+  function appendUtmToPayload(data) {
+    var utm = getUtm();
+    UTM_KEYS.forEach(function (key) {
+      if (utm[key]) data[key] = utm[key];
+    });
+    return data;
   }
 
   function lockBody(lock) {
@@ -326,7 +380,7 @@
         return;
       }
 
-      var data = {
+      var data = appendUtmToPayload({
         name: form.name.value.trim(),
         phone: form.phone.value.trim(),
         contact: (form.querySelector('input[name="contact"]:checked') || {}).value || "",
@@ -342,7 +396,7 @@
         ua: navigator.userAgent,
         elapsed: elapsed,
         turnstile: getTurnstileToken()
-      };
+      });
 
       submitBtn.disabled = true;
       var origHtml = submitBtn.innerHTML;
@@ -383,11 +437,7 @@
   /* ---------- analytics ---------- */
   function trackCallClick(place) {
     if (typeof gtag !== "function") return;
-    gtag("event", "click_call", {
-      lang: lang,
-      page: "samarkand-antalya",
-      call_place: place || "other"
-    });
+    gtag("event", "click_call", getAnalyticsParams({ call_place: place || "other" }));
   }
 
   function getCallPlace(link) {
@@ -409,26 +459,17 @@
 
   function fireConversion() {
     if (typeof gtag !== "function") return;
+    var params = getAnalyticsParams({ currency: "USD", value: 1.0 });
     // Google Ads conversion (Отправка формы для потенциальных клиентов)
-    gtag('event', 'conversion', {
-      'send_to': CONFIG.GADS_CONVERSION,
-      'value': 1.0,
-      'currency': 'USD'
+    gtag("event", "conversion", {
+      send_to: CONFIG.GADS_CONVERSION,
+      value: 1.0,
+      currency: "USD"
     });
     // GA4 qualify_lead
-    gtag('event', 'qualify_lead', {
-      'currency': 'USD',
-      'value': 1.0,
-      'lang': lang,
-      'page': 'samarkand-antalya'
-    });
+    gtag("event", "qualify_lead", params);
     // GA4 generate_lead
-    gtag('event', 'generate_lead', {
-      'currency': 'USD',
-      'value': 1.0,
-      'lang': lang,
-      'page': 'samarkand-antalya'
-    });
+    gtag("event", "generate_lead", params);
   }
 
   /* ---------- office map (lazy) ---------- */
@@ -463,6 +504,7 @@
   }
 
   /* ---------- init ---------- */
+  initUtm();
   applyLang(lang);
   initCallTracking();
   initTurnstile();

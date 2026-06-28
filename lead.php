@@ -107,6 +107,9 @@ $lead = [
     'page'        => $clean('page', 60),
     'url'         => $clean('url', 300),
     'ref'         => $clean('ref', 300),
+    'utm_source'  => $clean('utm_source', 80),
+    'utm_medium'  => $clean('utm_medium', 80),
+    'utm_campaign'=> $clean('utm_campaign', 120),
 ];
 
 // --- 1) пишем в CSV ---
@@ -185,7 +188,7 @@ function verify_turnstile(string $token, string $secret): bool {
 }
 
 function save_csv(array $lead): void {
-    $headers = ['Дата','Имя','Телефон','Связь','Взрослых','Детей','Класс','Трансфер','Комментарий','Язык','Страница','URL','Referrer'];
+    $headers = ['Дата','Имя','Телефон','Связь','Взрослых','Детей','Класс','Трансфер','Комментарий','Язык','Страница','URL','Referrer','UTM Source','UTM Medium','UTM Campaign'];
     $isNew = !is_file(CSV_FILE);
     $fp = @fopen(CSV_FILE, 'a');
     if (!$fp) { return; }
@@ -213,6 +216,12 @@ function send_telegram(array $lead): void {
     $text .= "🚐 <b>Трансфер:</b> " . $e($lead['transfer']) . "\n";
     if ($lead['comment'] !== '') { $text .= "📝 <b>Комментарий:</b> " . $e($lead['comment']) . "\n"; }
     $text .= "🌐 <b>Язык:</b> " . $e($lead['lang']) . "\n";
+    if ($lead['utm_source'] !== '') {
+        $text .= "📣 <b>UTM:</b> " . $e($lead['utm_source']);
+        if ($lead['utm_medium'] !== '') { $text .= " / " . $e($lead['utm_medium']); }
+        if ($lead['utm_campaign'] !== '') { $text .= " / " . $e($lead['utm_campaign']); }
+        $text .= "\n";
+    }
     if ($lead['url'] !== '') { $text .= "🔗 " . $e($lead['url']); }
 
     $payload = json_encode([
