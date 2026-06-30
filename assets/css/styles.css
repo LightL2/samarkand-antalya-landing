@@ -1101,7 +1101,8 @@ ul { margin: 0; padding: 0; list-style: none; }
 }
 .turnstile-field__retry { margin: 0 auto; }
 .lead__policy { color: var(--gray-400); font-size: 11px; text-align: center; margin: var(--space-3) 0 0; line-height: 1.45; }
-.form-msg { margin-top: var(--space-3); padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; }
+.form-msg { margin: 0 0 var(--space-4); padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; }
+.form-msg[hidden] { display: none !important; }
 .form-msg.is-error { background: rgba(217,4,61,.08); color: var(--red); }
 .form-msg.is-ok { background: rgba(191,242,5,.15); color: #3c5400; }
 

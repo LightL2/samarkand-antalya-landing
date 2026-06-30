@@ -57,7 +57,9 @@ $d = json_decode($raw, true);
 if (!is_array($d)) { $d = $_POST; }
 
 // --- анти-бот: honeypot ---
-if (!empty($d['website']) || !empty($d['company'])) { out(['ok' => true]); }
+if (!empty($d['hp_bot_x']) || !empty($d['hp_bot_y']) || !empty($d['website']) || !empty($d['company'])) {
+    out(['ok' => true]);
+}
 
 // --- анти-бот: Cloudflare Turnstile ---
 if (TURNSTILE_SECRET !== '') {

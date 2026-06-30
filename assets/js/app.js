@@ -270,9 +270,24 @@
 
   function showMsg(text, type) {
     if (!msg) return;
-    msg.hidden = false;
+    msg.removeAttribute("hidden");
     msg.textContent = text;
     msg.className = "form-msg " + (type === "ok" ? "is-ok" : "is-error");
+    try { msg.scrollIntoView({ behavior: "smooth", block: "nearest" }); } catch (e) {}
+  }
+
+  function formVal(name) {
+    if (!form || !form.elements) return "";
+    var el = form.elements.namedItem(name);
+    return el && "value" in el ? String(el.value).trim() : "";
+  }
+
+  function countLetters(v) {
+    try {
+      return (v.match(/\p{L}/gu) || []).length;
+    } catch (e) {
+      return (v.match(/[a-zA-Z\u0400-\u04FF\u0600-\u06FF\u0980-\u09FF\u1E00-\u1EFF]/g) || []).length;
+    }
   }
 
   function isValidName(v) {
@@ -280,8 +295,12 @@
     if (v.length < 3 || v.length > 80) return false;
     if (/\d/.test(v)) return false;
     if (/[#*@$%^&_=+\[\]{}|\\<>~`]/.test(v)) return false;
-    if (/(.)\1{4,}/u.test(v)) return false;
-    return (v.match(/\p{L}/gu) || []).length >= 2;
+    try {
+      if (/(.)\1{4,}/u.test(v)) return false;
+    } catch (e) {
+      if (/(.)\1{4,}/.test(v)) return false;
+    }
+    return countLetters(v) >= 2;
   }
 
   var UZ_OPS = ["90","91","93","94","95","97","98","99","33","50","88","77","20","71"];
@@ -439,72 +458,80 @@
       });
     }
 
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-      if (msg) msg.hidden = true;
+    function handleSubmit(e) {
+      if (e) e.preventDefault();
+      try {
+        if (msg) msg.setAttribute("hidden", "");
 
-      // honeypot
-      if ((form.website && form.website.value) || (form.company && form.company.value)) { return; }
-      // timing trap
-      var elapsed = Date.now() - parseInt(tsField.value || "0", 10);
-      if (elapsed < CONFIG.MIN_FILL_MS) {
-        showMsg(t("msg.error"), "error");
-        return;
-      }
-      if (!validateForm()) { return; }
+        if (formVal("hp_bot_x") || formVal("hp_bot_y")) { return; }
 
-      if (CONFIG.TURNSTILE_ENABLED && CONFIG.TURNSTILE_SITE_KEY && !getTurnstileToken()) {
-        showMsg(
-          turnstileBroken
-            ? turnstileErrorTextForSubmit()
-            : t("msg.captcha"),
-          "error"
-        );
-        return;
-      }
+        var elapsed = Date.now() - parseInt((tsField && tsField.value) || "0", 10);
+        if (elapsed < CONFIG.MIN_FILL_MS) {
+          showMsg(t("msg.error"), "error");
+          return;
+        }
+        if (!validateForm()) { return; }
 
-      var data = appendUtmToPayload({
-        name: form.name.value.trim(),
-        phone: form.phone.value.trim(),
-        contact: (form.querySelector('input[name="contact"]:checked') || {}).value || "",
-        adults: form.adults.value,
-        children: form.children.value,
-        flightClass: form.flightClass.value,
-        transfer: form.transfer.value,
-        comment: form.comment.value.trim(),
-        lang: lang,
-        page: form.page.value,
-        url: location.href,
-        ref: document.referrer || "",
-        ua: navigator.userAgent,
-        elapsed: elapsed,
-        turnstile: getTurnstileToken()
-      });
-
-      submitBtn.disabled = true;
-      var origHtml = submitBtn.innerHTML;
-      submitBtn.innerHTML = "<span>" + t("msg.sending") + "</span>";
-
-      sendLead(data)
-        .then(function () {
-          form.reset();
-          tsField.value = String(Date.now());
-          resetTurnstile();
-          fireConversion();
-          openModal();
-        })
-        .catch(function (err) {
+        var tsToken = getTurnstileToken();
+        if (CONFIG.TURNSTILE_ENABLED && CONFIG.TURNSTILE_SITE_KEY && !tsToken) {
           showMsg(
-            err && err.code === "captcha" ? t("msg.captchaFail") : t("msg.error"),
+            turnstileBroken
+              ? turnstileErrorTextForSubmit()
+              : t("msg.captcha"),
             "error"
           );
-          resetTurnstile();
-        })
-        .then(function () {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = origHtml;
+          return;
+        }
+
+        var data = appendUtmToPayload({
+          name: formVal("name"),
+          phone: formVal("phone"),
+          contact: (form.querySelector('input[name="contact"]:checked') || {}).value || "",
+          adults: formVal("adults"),
+          children: formVal("children"),
+          flightClass: formVal("flightClass"),
+          transfer: formVal("transfer"),
+          comment: formVal("comment"),
+          lang: lang,
+          page: formVal("page"),
+          url: location.href,
+          ref: document.referrer || "",
+          ua: navigator.userAgent,
+          elapsed: elapsed,
+          turnstile: tsToken
         });
-    });
+
+        if (!submitBtn) return;
+        submitBtn.disabled = true;
+        var origHtml = submitBtn.innerHTML;
+        submitBtn.innerHTML = "<span>" + t("msg.sending") + "</span>";
+
+        sendLead(data)
+          .then(function () {
+            form.reset();
+            if (tsField) tsField.value = String(Date.now());
+            resetTurnstile();
+            fireConversion();
+            openModal();
+          })
+          .catch(function (err) {
+            showMsg(
+              err && err.code === "captcha" ? t("msg.captchaFail") : t("msg.error"),
+              "error"
+            );
+            resetTurnstile();
+          })
+          .then(function () {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = origHtml;
+          });
+      } catch (err) {
+        showMsg(t("msg.error"), "error");
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    }
+
+    form.addEventListener("submit", handleSubmit);
   }
 
   function sendLead(data) {

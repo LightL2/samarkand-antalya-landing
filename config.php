@@ -10,5 +10,5 @@
     // Cloudflare Turnstile — https://dash.cloudflare.com → Turnstile
     'turnstile_enabled'    => true,
     'turnstile_site_key'   => '0x4AAAAAAADtNGwEOWGIXVn19',
-    'turnstile_secret_key' => '0x4AAAAAAADtNG845j1cWXxaFD1PyajbHLbI',
+    'turnstile_secret_key' => '0x4AAAAAAADtNG845jlcWXxaFDlPyajbHLbI',
 ];
