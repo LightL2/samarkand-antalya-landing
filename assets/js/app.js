@@ -326,18 +326,36 @@
     if (!field || !box) return;
     field.hidden = false;
 
-    var s = document.createElement("script");
-    s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-    s.async = true;
-    s.onload = function () {
+    function renderWidget() {
       if (!window.turnstile) return;
+      box.innerHTML = "";
       var widgetId = window.turnstile.render(box, {
         sitekey: CONFIG.TURNSTILE_SITE_KEY,
         theme: "light",
-        appearance: "interaction-only",
-        language: lang === "uz" ? "uz" : "ru"
+        size: "flexible",
+        appearance: "always",
+        language: lang === "ru" ? "ru" : "en",
+        "error-callback": function () {
+          box.classList.add("is-error");
+        },
+        "expired-callback": function () {
+          resetTurnstile();
+        }
       });
       box.setAttribute("data-widget-id", widgetId);
+    }
+
+    if (window.turnstile) {
+      renderWidget();
+      return;
+    }
+
+    var s = document.createElement("script");
+    s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+    s.async = true;
+    s.onload = renderWidget;
+    s.onerror = function () {
+      showMsg(t("msg.captcha"), "error");
     };
     document.head.appendChild(s);
   }

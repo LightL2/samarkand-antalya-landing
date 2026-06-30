@@ -1074,7 +1074,18 @@ ul { margin: 0; padding: 0; list-style: none; }
   color: var(--gray-600);
   text-align: center;
 }
-.turnstile-field #turnstileBox { display: flex; justify-content: center; min-height: 65px; }
+.turnstile-field #turnstileBox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 70px;
+  width: 100%;
+}
+.turnstile-field #turnstileBox.is-error {
+  outline: 2px dashed var(--red);
+  outline-offset: 4px;
+  border-radius: var(--radius-sm);
+}
 .lead__policy { color: var(--gray-400); font-size: 11px; text-align: center; margin: var(--space-3) 0 0; line-height: 1.45; }
 .form-msg { margin-top: var(--space-3); padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; }
 .form-msg.is-error { background: rgba(217,4,61,.08); color: var(--red); }
