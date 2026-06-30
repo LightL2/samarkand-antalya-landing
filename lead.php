@@ -56,11 +56,11 @@ if (!is_array($d)) { $d = $_POST; }
 // --- анти-бот: honeypot ---
 if (!empty($d['website']) || !empty($d['company'])) { out(['ok' => true]); }
 
-// --- анти-бот: Cloudflare Turnstile (если ключ задан в config.php) ---
+// --- анти-бот: Cloudflare Turnstile ---
 if (TURNSTILE_SECRET !== '') {
     $tsToken = trim((string)($d['turnstile'] ?? ''));
     if ($tsToken === '' || !verify_turnstile($tsToken, TURNSTILE_SECRET)) {
-        out(['ok' => true]);
+        out(['ok' => false, 'error' => 'captcha'], 422);
     }
 }
 

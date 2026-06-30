@@ -13,7 +13,7 @@
     GADS_CONVERSION: "AW-18224907931/aHBPCMqxxrscEJuNqPJD", // send_to для конверсии
     MIN_FILL_MS: 2500, // антибот: форма не может быть отправлена быстрее
     LANG_MODAL_DELAY_MS: 3000, // поп-ап языка — после прогрузки страницы
-    TURNSTILE_SITE_KEY: "", // Cloudflare Turnstile — публичный ключ (см. config.example.php)
+    TURNSTILE_SITE_KEY: window.TURNSTILE_SITE_KEY || "",
     UTM_STORAGE_KEY: "al_utm"
   };
 
@@ -333,7 +333,9 @@
       if (!window.turnstile) return;
       var widgetId = window.turnstile.render(box, {
         sitekey: CONFIG.TURNSTILE_SITE_KEY,
-        theme: "light"
+        theme: "light",
+        appearance: "interaction-only",
+        language: lang === "uz" ? "uz" : "ru"
       });
       box.setAttribute("data-widget-id", widgetId);
     };
@@ -410,8 +412,9 @@
           fireConversion();
           openModal();
         })
-        .catch(function () {
-          showMsg(t("msg.error"), "error");
+        .catch(function (err) {
+          showMsg(err && err.code === "captcha" ? t("msg.captcha") : t("msg.error"), "error");
+          resetTurnstile();
         })
         .then(function () {
           submitBtn.disabled = false;
@@ -426,11 +429,19 @@
       headers: { "Content-Type": "application/json;charset=utf-8" },
       body: JSON.stringify(data)
     }).then(function (r) {
-      if (!r.ok) throw new Error("bad status " + r.status);
-      return r.json().catch(function () { return {}; });
-    }).then(function (res) {
-      if (res && res.ok === false) throw new Error(res.error || "server error");
-      return res;
+      return r.json().catch(function () { return {}; }).then(function (res) {
+        if (!r.ok) {
+          var err = new Error(res.error || ("bad status " + r.status));
+          err.code = res.error || "";
+          throw err;
+        }
+        if (res && res.ok === false) {
+          var err2 = new Error(res.error || "server error");
+          err2.code = res.error || "";
+          throw err2;
+        }
+        return res;
+      });
     });
   }
 

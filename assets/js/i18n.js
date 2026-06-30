@@ -105,6 +105,7 @@ window.I18N = {
     "form.individual": "Индивидуальный",
     "form.comment": "Комментарий",
     "form.submit": "Отправить заявку",
+    "form.captchaLabel": "Подтвердите, что вы не робот",
     "form.policy": "Нажимая кнопку, вы соглашаетесь на обработку персональных данных.",
 
     "faq.eyebrow": "FAQ",
@@ -257,6 +258,7 @@ window.I18N = {
     "form.individual": "Individual",
     "form.comment": "Izoh",
     "form.submit": "Arizani yuborish",
+    "form.captchaLabel": "Robot emasligingizni tasdiqlang",
     "form.policy": "Tugmani bosish orqali shaxsiy maʼlumotlarni qayta ishlashga rozilik bildirasiz.",
 
     "faq.eyebrow": "FAQ",
