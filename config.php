@@ -8,6 +8,7 @@
     'telegram_chat_id' => '5887158228',
 
     // Cloudflare Turnstile — https://dash.cloudflare.com → Turnstile
+    'turnstile_enabled'    => true,
     'turnstile_site_key'   => '0x4AAAAAAADtNGwEOWGIXVn19',
     'turnstile_secret_key' => '0x4AAAAAAADtNG845j1cWXxaFD1PyajbHLbI',
 ];
