@@ -335,6 +335,10 @@
     if (!field || !box) return;
     field.hidden = false;
 
+    var widgetId = null;
+    var errorRetries = 0;
+    var MAX_ERROR_RETRIES = 2;
+
     function turnstileErrorText(code) {
       var host = location.hostname || "ваш домен";
       if (code === 110200 || code === "110200") {
@@ -355,44 +359,77 @@
         '<button type="button" class="btn btn--sm btn--outline turnstile-field__retry" id="turnstileRetry">' +
         t("msg.captchaRetry") + "</button>";
       var retry = $("#turnstileRetry");
-      if (retry) retry.addEventListener("click", renderWidget);
+      if (retry) retry.addEventListener("click", function () {
+        errorRetries = 0;
+        renderWidget();
+      });
+    }
+
+    function clearWidget() {
+      if (widgetId !== null && window.turnstile) {
+        try { window.turnstile.remove(widgetId); } catch (e) {}
+      }
+      widgetId = null;
+      box.removeAttribute("data-widget-id");
+      box.innerHTML = "";
+    }
+
+    function doRender() {
+      if (!window.turnstile) return false;
+      clearWidget();
+      box.classList.remove("is-error");
+      turnstileBroken = false;
+
+      try {
+        widgetId = window.turnstile.render(box, {
+          sitekey: CONFIG.TURNSTILE_SITE_KEY,
+          theme: "light",
+          retry: "auto",
+          "refresh-expired": "auto",
+          callback: function () {
+            turnstileReady = true;
+            turnstileBroken = false;
+            errorRetries = 0;
+            box.classList.remove("is-error");
+          },
+          "error-callback": function (code) {
+            turnstileReady = false;
+            if (errorRetries < MAX_ERROR_RETRIES) {
+              errorRetries += 1;
+              setTimeout(renderWidget, 1200);
+              return;
+            }
+            showTurnstileError(code);
+          },
+          "expired-callback": function () {
+            turnstileReady = false;
+            resetTurnstile();
+          }
+        });
+        box.setAttribute("data-widget-id", widgetId);
+        return true;
+      } catch (e) {
+        showTurnstileError("render");
+        return false;
+      }
     }
 
     function renderWidget() {
       turnstileBroken = false;
-      box.classList.remove("is-error");
-      box.innerHTML = "";
 
-      function doRender() {
-        if (!window.turnstile) {
-          showTurnstileError("load");
-          return;
-        }
-        try {
-          var widgetId = window.turnstile.render(box, {
-            sitekey: CONFIG.TURNSTILE_SITE_KEY,
-            theme: "light",
-            callback: function () {
-              turnstileReady = true;
-              turnstileBroken = false;
-              box.classList.remove("is-error");
-            },
-            "error-callback": function (code) {
-              showTurnstileError(code);
-            },
-            "expired-callback": function () {
-              turnstileReady = false;
-              resetTurnstile();
-            }
+      function start() {
+        window.turnstile.ready(function () {
+          field.hidden = false;
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              if (!doRender()) showTurnstileError("load");
+            });
           });
-          box.setAttribute("data-widget-id", widgetId);
-        } catch (e) {
-          showTurnstileError("render");
-        }
+        });
       }
 
       if (window.turnstile) {
-        doRender();
+        start();
         return;
       }
 
@@ -401,15 +438,26 @@
         waited += 100;
         if (window.turnstile) {
           clearInterval(timer);
-          doRender();
-        } else if (waited >= 8000) {
+          start();
+        } else if (waited >= 10000) {
           clearInterval(timer);
           showTurnstileError("load");
         }
       }, 100);
     }
 
-    renderWidget();
+    function boot() {
+      renderWidget();
+    }
+
+    if (window.__turnstileApiReady) {
+      boot();
+    } else {
+      document.addEventListener("al-turnstile-api-ready", boot, { once: true });
+      setTimeout(function () {
+        if (!window.__turnstileApiReady && !widgetId) boot();
+      }, 300);
+    }
   }
 
   function getTurnstileToken() {
@@ -422,7 +470,9 @@
     var box = $("#turnstileBox");
     if (!box) return;
     var id = box.getAttribute("data-widget-id");
-    if (id) window.turnstile.reset(id);
+    if (id !== null && id !== "") {
+      try { window.turnstile.reset(id); } catch (e) {}
+    }
   }
 
   if (form) {
