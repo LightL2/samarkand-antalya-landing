@@ -410,18 +410,30 @@
 
     window.__mountTurnstile = function () { mountTurnstile(false); };
 
-    if (window.__turnstileApiReady) {
+    if (window.__turnstileApiReady || window.turnstile) {
       mountTurnstile(false);
     }
 
+    var pollMs = 0;
+    var pollId = setInterval(function () {
+      pollMs += 200;
+      if (mounted || box.classList.contains("is-error")) {
+        clearInterval(pollId);
+        return;
+      }
+      if (window.turnstile) mountTurnstile(false);
+      if (mounted || pollMs >= 15000) clearInterval(pollId);
+    }, 200);
+
     setTimeout(function () {
+      clearInterval(pollId);
       if (!box.querySelector("iframe") && !box.classList.contains("is-error")) {
         if (window.turnstile) mountTurnstile(false);
         if (!box.querySelector("iframe") && !box.classList.contains("is-error")) {
           showTurnstileError("load");
         }
       }
-    }, 12000);
+    }, 15000);
   }
 
   function getTurnstileToken() {
