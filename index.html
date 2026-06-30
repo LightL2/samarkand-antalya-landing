@@ -456,7 +456,9 @@
 
         <div class="field turnstile-field" id="turnstileField" hidden>
           <p class="turnstile-field__label" data-i18n="form.captchaLabel">Подтвердите, что вы не робот</p>
-          <div id="turnstileBox"></div>
+          <div id="turnstileBox" class="cf-turnstile" data-theme="light" data-size="flexible"
+               data-callback="alTurnstileOk" data-error-callback="alTurnstileErr" data-expired-callback="alTurnstileExpired"></div>
+          <div id="turnstileError" class="turnstile-field__error-panel" hidden></div>
         </div>
 
         <button type="submit" class="btn btn--accent btn--block btn--lg" id="submitBtn">
@@ -651,12 +653,33 @@
 
   <script src="turnstile-config.php"></script>
   <script>
-    window.alTurnstileOnLoad = function () {
-      window.__turnstileApiReady = true;
-      if (typeof window.__mountTurnstile === "function") window.__mountTurnstile();
+    (function () {
+      if (!window.TURNSTILE_SITE_KEY || window.TURNSTILE_ENABLED === false) return;
+      var field = document.getElementById("turnstileField");
+      var box = document.getElementById("turnstileBox");
+      if (box) box.setAttribute("data-sitekey", window.TURNSTILE_SITE_KEY);
+      if (field) field.hidden = false;
+    })();
+    window.alTurnstileOk = function () {
+      window.__turnstileReady = true;
+      window.__turnstileBroken = false;
+    };
+    window.alTurnstileErr = function (code) {
+      window.__turnstileReady = false;
+      window.__turnstileBroken = true;
+      window.__turnstileErrCode = code;
+      if (typeof window.__showTurnstileError === "function") window.__showTurnstileError(code);
+    };
+    window.alTurnstileExpired = function () {
+      window.__turnstileReady = false;
+      if (window.turnstile) {
+        var box = document.getElementById("turnstileBox");
+        var id = box && box.getAttribute("data-widget-id");
+        if (id) try { window.turnstile.reset(id); } catch (e) {}
+      }
     };
   </script>
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=alTurnstileOnLoad" async defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <script src="assets/js/i18n.js"></script>
   <script src="assets/js/app.js"></script>
 </body>

@@ -156,6 +156,7 @@ window.I18N = {
     "msg.captchaLoad": "Не удалось загрузить проверку. Обновите страницу или нажмите «Повторить».",
     "msg.captchaKey": "Неверный ключ Turnstile. Проверьте site key в config.php.",
     "msg.captchaDomain": "Домен «{host}» не добавлен в Cloudflare Turnstile. Администратору: Turnstile → Hostname Management → добавить этот домен.",
+    "msg.captchaBlocked": "Блокируется загрузка Cloudflare. Отключите блокировщик рекламы или VPN и обновите страницу.",
     "msg.captchaRetry": "Повторить",
     "msg.sending": "Отправляем…"
   },
@@ -313,6 +314,7 @@ window.I18N = {
     "msg.captchaLoad": "Tekshiruv yuklanmadi. Sahifani yangilang yoki «Qayta urinish»ni bosing.",
     "msg.captchaKey": "Turnstile kaliti notoʻgʻri. config.php dagi site key ni tekshiring.",
     "msg.captchaDomain": "«{host}» domeni Cloudflare Turnstile ga qoʻshilmagan. Turnstile → Hostname Management.",
+    "msg.captchaBlocked": "Cloudflare yuklanishi bloklangan. Reklama bloklagich yoki VPN ni oʻchiring va sahifani yangilang.",
     "msg.captchaRetry": "Qayta urinish",
     "msg.sending": "Yuborilmoqda…"
   }

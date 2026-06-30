@@ -332,108 +332,77 @@
     if (!CONFIG.TURNSTILE_ENABLED || !CONFIG.TURNSTILE_SITE_KEY) return;
     var field = $("#turnstileField");
     var box = $("#turnstileBox");
+    var errPanel = $("#turnstileError");
     if (!field || !box) return;
     field.hidden = false;
-
-    var mounted = false;
+    if (!box.getAttribute("data-sitekey")) {
+      box.setAttribute("data-sitekey", CONFIG.TURNSTILE_SITE_KEY);
+    }
 
     function turnstileErrorText(code) {
       var host = location.hostname || "ваш домен";
       if (code === 110200 || code === "110200") {
         return t("msg.captchaDomain").replace("{host}", host);
       }
-      if (code === 110100 || code === 110110 || code === "110100" || code === "110110") {
+      if (code === 110100 || code === 110110 || code === "110100" || code === "110110" ||
+          code === 400020 || code === "400020") {
         return t("msg.captchaKey");
       }
+      if (code === 200500 || code === "200500") {
+        return t("msg.captchaBlocked");
+      }
       return t("msg.captchaLoad");
+    }
+
+    function hideTurnstileError() {
+      turnstileBroken = false;
+      if (errPanel) errPanel.hidden = true;
     }
 
     function showTurnstileError(code) {
       turnstileBroken = true;
       turnstileReady = false;
-      mounted = false;
-      box.classList.add("is-error");
-      box.innerHTML =
+      if (!errPanel) return;
+      errPanel.hidden = false;
+      errPanel.innerHTML =
         '<p class="turnstile-field__error">' + turnstileErrorText(code) + "</p>" +
         '<button type="button" class="btn btn--sm btn--outline turnstile-field__retry" id="turnstileRetry">' +
         t("msg.captchaRetry") + "</button>";
       var retry = $("#turnstileRetry");
       if (retry) {
         retry.addEventListener("click", function () {
-          box.classList.remove("is-error");
-          box.innerHTML = "";
-          mountTurnstile(true);
-        });
-      }
-    }
-
-    function mountTurnstile(force) {
-      if (!window.turnstile) return false;
-      if (mounted && !force) return true;
-      if (force && box.getAttribute("data-widget-id")) {
-        try { window.turnstile.remove(box.getAttribute("data-widget-id")); } catch (e) {}
-        box.removeAttribute("data-widget-id");
-        box.innerHTML = "";
-        mounted = false;
-      }
-      if (mounted) return true;
-
-      try {
-        var id = window.turnstile.render(box, {
-          sitekey: CONFIG.TURNSTILE_SITE_KEY,
-          theme: "light",
-          retry: "auto",
-          "refresh-expired": "auto",
-          callback: function () {
-            turnstileReady = true;
-            turnstileBroken = false;
-            box.classList.remove("is-error");
-          },
-          "error-callback": function (code) {
-            turnstileReady = false;
-            showTurnstileError(code);
-          },
-          "expired-callback": function () {
-            turnstileReady = false;
-            resetTurnstile();
+          hideTurnstileError();
+          if (window.turnstile && box.getAttribute("data-widget-id")) {
+            try { window.turnstile.reset(box.getAttribute("data-widget-id")); } catch (e) {}
+          } else {
+            location.reload();
           }
         });
-        box.setAttribute("data-widget-id", id);
-        mounted = true;
-        turnstileBroken = false;
-        return true;
-      } catch (e) {
-        showTurnstileError("render");
-        return false;
       }
     }
 
-    window.__mountTurnstile = function () { mountTurnstile(false); };
+    window.__showTurnstileError = showTurnstileError;
+    window.alTurnstileOk = function () {
+      turnstileReady = true;
+      turnstileBroken = false;
+      hideTurnstileError();
+    };
+    window.alTurnstileErr = function (code) {
+      turnstileReady = false;
+      showTurnstileError(code);
+    };
+    window.alTurnstileExpired = function () {
+      turnstileReady = false;
+      resetTurnstile();
+    };
 
-    if (window.__turnstileApiReady || window.turnstile) {
-      mountTurnstile(false);
-    }
-
-    var pollMs = 0;
-    var pollId = setInterval(function () {
-      pollMs += 200;
-      if (mounted || box.classList.contains("is-error")) {
-        clearInterval(pollId);
-        return;
-      }
-      if (window.turnstile) mountTurnstile(false);
-      if (mounted || pollMs >= 15000) clearInterval(pollId);
-    }, 200);
+    if (window.__turnstileErrCode) showTurnstileError(window.__turnstileErrCode);
 
     setTimeout(function () {
-      clearInterval(pollId);
-      if (!box.querySelector("iframe") && !box.classList.contains("is-error")) {
-        if (window.turnstile) mountTurnstile(false);
-        if (!box.querySelector("iframe") && !box.classList.contains("is-error")) {
-          showTurnstileError("load");
-        }
-      }
-    }, 15000);
+      if (turnstileReady || getTurnstileToken()) return;
+      if (box.getAttribute("data-widget-id")) return;
+      if (!turnstileBroken) showTurnstileError("load");
+    }, 20000);
   }
 
   function getTurnstileToken() {
@@ -446,6 +415,7 @@
     var box = $("#turnstileBox");
     if (!box) return;
     var id = box.getAttribute("data-widget-id");
+    turnstileReady = false;
     if (id !== null && id !== "") {
       try { window.turnstile.reset(id); } catch (e) {}
     }

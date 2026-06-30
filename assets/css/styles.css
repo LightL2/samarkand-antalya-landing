@@ -1081,13 +1081,16 @@ ul { margin: 0; padding: 0; list-style: none; }
   min-height: 70px;
   width: 100%;
 }
-.turnstile-field #turnstileBox.is-error {
+.turnstile-field__error-panel {
+  display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  margin-top: var(--space-3);
   padding: var(--space-4);
   background: rgba(217,4,61,.04);
   border: 1px dashed rgba(217,4,61,.35);
   border-radius: var(--radius-sm);
+  text-align: center;
 }
 .turnstile-field__error {
   margin: 0;

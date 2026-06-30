@@ -11,4 +11,3 @@ $enabled = array_key_exists('turnstile_enabled', $cfg) ? (bool)$cfg['turnstile_e
 
 echo 'window.TURNSTILE_SITE_KEY=' . json_encode($key, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . ';';
 echo 'window.TURNSTILE_ENABLED=' . ($enabled ? 'true' : 'false') . ';';
-echo 'window.alTurnstileOnLoad=function(){window.__turnstileApiReady=true;if(typeof window.__mountTurnstile==="function")window.__mountTurnstile();};';
