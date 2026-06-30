@@ -354,28 +354,8 @@
     var errPanel = $("#turnstileError");
     if (!field || !box) return;
     field.hidden = false;
-    if (!box.getAttribute("data-sitekey")) {
-      box.setAttribute("data-sitekey", CONFIG.TURNSTILE_SITE_KEY);
-    }
 
-    function remountTurnstile() {
-      window.__turnstileToken = "";
-      turnstileReady = false;
-      turnstileBroken = false;
-      hideTurnstileError();
-      if (!box || !CONFIG.TURNSTILE_SITE_KEY) {
-        location.reload();
-        return;
-      }
-      box.setAttribute("data-sitekey", CONFIG.TURNSTILE_SITE_KEY);
-      if (window.turnstile && box.getAttribute("data-widget-id")) {
-        try {
-          window.turnstile.reset(box.getAttribute("data-widget-id"));
-          return;
-        } catch (e) {}
-      }
-      location.reload();
-    }
+    var mounted = false;
 
     function turnstileErrorText(code) {
       var host = location.hostname || "ваш домен";
@@ -400,6 +380,7 @@
     function showTurnstileError(code) {
       turnstileBroken = true;
       turnstileReady = false;
+      mounted = false;
       if (!errPanel) return;
       errPanel.hidden = false;
       errPanel.innerHTML =
@@ -408,30 +389,94 @@
         t("msg.captchaRetry") + "</button>";
       var retry = $("#turnstileRetry");
       if (retry) {
-        retry.addEventListener("click", function () { remountTurnstile(); });
+        retry.addEventListener("click", function () { mountTurnstile(true); });
       }
     }
 
-    window.__showTurnstileError = showTurnstileError;
-    window.alTurnstileOk = function (token) {
+    function onTurnstileOk(token) {
       window.__turnstileToken = token || "";
       turnstileReady = true;
       turnstileBroken = false;
       hideTurnstileError();
-    };
-    window.alTurnstileErr = function (code) {
+      try { sessionStorage.removeItem("al_ts_reload"); } catch (e) {}
+    }
+
+    function onTurnstileErr(code) {
       turnstileReady = false;
+      var retryCodes = [110100, 110110, 110200, 400020, "110100", "110110", "110200", "400020"];
+      if (retryCodes.indexOf(code) !== -1) {
+        try {
+          if (!sessionStorage.getItem("al_ts_reload")) {
+            sessionStorage.setItem("al_ts_reload", "1");
+            location.reload();
+            return;
+          }
+        } catch (e) {}
+      }
       showTurnstileError(code);
-    };
+    }
+
+    function mountTurnstile(force) {
+      if (!window.turnstile || !CONFIG.TURNSTILE_SITE_KEY) return false;
+      hideTurnstileError();
+      if (force && box.getAttribute("data-widget-id")) {
+        try { window.turnstile.remove(box.getAttribute("data-widget-id")); } catch (e) {}
+        box.removeAttribute("data-widget-id");
+        box.innerHTML = "";
+        mounted = false;
+      }
+      if (mounted && !force) return true;
+
+      try {
+        var id = window.turnstile.render(box, {
+          sitekey: CONFIG.TURNSTILE_SITE_KEY,
+          theme: "light",
+          size: "flexible",
+          retry: "auto",
+          "refresh-expired": "auto",
+          callback: onTurnstileOk,
+          "error-callback": onTurnstileErr,
+          "expired-callback": function () {
+            turnstileReady = false;
+            window.__turnstileToken = "";
+            mountTurnstile(true);
+          }
+        });
+        box.setAttribute("data-widget-id", id);
+        mounted = true;
+        turnstileBroken = false;
+        return true;
+      } catch (e) {
+        showTurnstileError("render");
+        return false;
+      }
+    }
+
+    window.__showTurnstileError = showTurnstileError;
+    window.__mountTurnstile = mountTurnstile;
+    window.alTurnstileOk = onTurnstileOk;
+    window.alTurnstileErr = onTurnstileErr;
     window.alTurnstileExpired = function () {
       turnstileReady = false;
-      resetTurnstile();
+      window.__turnstileToken = "";
+      mountTurnstile(true);
     };
 
-    if (window.__turnstileErrCode) showTurnstileError(window.__turnstileErrCode);
-    if (window.__turnstileToken || getTurnstileToken()) turnstileReady = true;
+    if (window.__turnstileApiReady) mountTurnstile(false);
+
+    var pollMs = 0;
+    var pollId = setInterval(function () {
+      pollMs += 200;
+      if (mounted || turnstileBroken) {
+        clearInterval(pollId);
+        return;
+      }
+      if (window.turnstile) mountTurnstile(false);
+      if (mounted || pollMs >= 15000) clearInterval(pollId);
+    }, 200);
 
     setTimeout(function () {
+      clearInterval(pollId);
       if (turnstileReady || getTurnstileToken()) return;
       if (box.getAttribute("data-widget-id")) return;
       if (!turnstileBroken) showTurnstileError("load");
@@ -439,7 +484,7 @@
 
     window.addEventListener("pageshow", function (e) {
       if (!e.persisted) return;
-      remountTurnstile();
+      mountTurnstile(true);
     });
   }
 

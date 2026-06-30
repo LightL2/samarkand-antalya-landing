@@ -456,10 +456,7 @@
 
         <div class="field turnstile-field" id="turnstileField" hidden>
           <p class="turnstile-field__label" data-i18n="form.captchaLabel">Подтвердите, что вы не робот</p>
-          <div id="turnstileBox" class="cf-turnstile"
-               data-sitekey="0x4AAAAAAADtNGwEOWGIXVn19"
-               data-theme="light" data-size="flexible"
-               data-callback="alTurnstileOk" data-error-callback="alTurnstileErr" data-expired-callback="alTurnstileExpired"></div>
+          <div id="turnstileBox"></div>
           <div id="turnstileError" class="turnstile-field__error-panel" hidden></div>
         </div>
 
@@ -655,18 +652,15 @@
 
   <script src="turnstile-config.php"></script>
   <script>
-    (function () {
-      var key = window.TURNSTILE_SITE_KEY || "0x4AAAAAAADtNGwEOWGIXVn19";
-      if (window.TURNSTILE_ENABLED === false) return;
-      var field = document.getElementById("turnstileField");
-      var box = document.getElementById("turnstileBox");
-      if (box) box.setAttribute("data-sitekey", key);
-      if (field) field.hidden = false;
-    })();
+    window.alTurnstileApiReady = function () {
+      window.__turnstileApiReady = true;
+      if (typeof window.__mountTurnstile === "function") window.__mountTurnstile();
+    };
     window.alTurnstileOk = function (token) {
       window.__turnstileToken = token || "";
       window.__turnstileReady = true;
       window.__turnstileBroken = false;
+      try { sessionStorage.removeItem("al_ts_reload"); } catch (e) {}
     };
     window.alTurnstileErr = function (code) {
       window.__turnstileReady = false;
@@ -676,15 +670,12 @@
     };
     window.alTurnstileExpired = function () {
       window.__turnstileReady = false;
-      if (window.turnstile) {
-        var box = document.getElementById("turnstileBox");
-        var id = box && box.getAttribute("data-widget-id");
-        if (id) try { window.turnstile.reset(id); } catch (e) {}
-      }
+      window.__turnstileToken = "";
+      if (typeof window.__mountTurnstile === "function") window.__mountTurnstile(true);
     };
   </script>
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-  <script src="assets/js/i18n.js?v=5"></script>
-  <script src="assets/js/app.js?v=5"></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&amp;onload=alTurnstileApiReady" async defer></script>
+  <script src="assets/js/i18n.js?v=6"></script>
+  <script src="assets/js/app.js?v=6"></script>
 </body>
 </html>
