@@ -14,8 +14,17 @@
     MIN_FILL_MS: 2500, // антибот: форма не может быть отправлена быстрее
     LANG_MODAL_DELAY_MS: 3000, // поп-ап языка — после прогрузки страницы
     TURNSTILE_SITE_KEY: window.TURNSTILE_SITE_KEY || "",
+    TURNSTILE_ENABLED: window.TURNSTILE_ENABLED !== false,
     UTM_STORAGE_KEY: "al_utm"
   };
+
+  var turnstileReady = false;
+  var turnstileBroken = false;
+
+  function turnstileErrorTextForSubmit() {
+    var host = location.hostname || "ваш домен";
+    return t("msg.captchaDomain").replace("{host}", host);
+  }
 
   var UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
 
@@ -320,44 +329,87 @@
   }
 
   function initTurnstile() {
-    if (!CONFIG.TURNSTILE_SITE_KEY) return;
+    if (!CONFIG.TURNSTILE_ENABLED || !CONFIG.TURNSTILE_SITE_KEY) return;
     var field = $("#turnstileField");
     var box = $("#turnstileBox");
     if (!field || !box) return;
     field.hidden = false;
 
+    function turnstileErrorText(code) {
+      var host = location.hostname || "ваш домен";
+      if (code === 110200 || code === "110200") {
+        return t("msg.captchaDomain").replace("{host}", host);
+      }
+      if (code === 110100 || code === 110110 || code === "110100" || code === "110110") {
+        return t("msg.captchaKey");
+      }
+      return t("msg.captchaLoad");
+    }
+
+    function showTurnstileError(code) {
+      turnstileBroken = true;
+      turnstileReady = false;
+      box.classList.add("is-error");
+      box.innerHTML =
+        '<p class="turnstile-field__error">' + turnstileErrorText(code) + "</p>" +
+        '<button type="button" class="btn btn--sm btn--outline turnstile-field__retry" id="turnstileRetry">' +
+        t("msg.captchaRetry") + "</button>";
+      var retry = $("#turnstileRetry");
+      if (retry) retry.addEventListener("click", renderWidget);
+    }
+
     function renderWidget() {
-      if (!window.turnstile) return;
+      turnstileBroken = false;
+      box.classList.remove("is-error");
       box.innerHTML = "";
-      var widgetId = window.turnstile.render(box, {
-        sitekey: CONFIG.TURNSTILE_SITE_KEY,
-        theme: "light",
-        size: "flexible",
-        appearance: "always",
-        language: lang === "ru" ? "ru" : "en",
-        "error-callback": function () {
-          box.classList.add("is-error");
-        },
-        "expired-callback": function () {
-          resetTurnstile();
+
+      function doRender() {
+        if (!window.turnstile) {
+          showTurnstileError("load");
+          return;
         }
-      });
-      box.setAttribute("data-widget-id", widgetId);
+        try {
+          var widgetId = window.turnstile.render(box, {
+            sitekey: CONFIG.TURNSTILE_SITE_KEY,
+            theme: "light",
+            callback: function () {
+              turnstileReady = true;
+              turnstileBroken = false;
+              box.classList.remove("is-error");
+            },
+            "error-callback": function (code) {
+              showTurnstileError(code);
+            },
+            "expired-callback": function () {
+              turnstileReady = false;
+              resetTurnstile();
+            }
+          });
+          box.setAttribute("data-widget-id", widgetId);
+        } catch (e) {
+          showTurnstileError("render");
+        }
+      }
+
+      if (window.turnstile) {
+        doRender();
+        return;
+      }
+
+      var waited = 0;
+      var timer = setInterval(function () {
+        waited += 100;
+        if (window.turnstile) {
+          clearInterval(timer);
+          doRender();
+        } else if (waited >= 8000) {
+          clearInterval(timer);
+          showTurnstileError("load");
+        }
+      }, 100);
     }
 
-    if (window.turnstile) {
-      renderWidget();
-      return;
-    }
-
-    var s = document.createElement("script");
-    s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-    s.async = true;
-    s.onload = renderWidget;
-    s.onerror = function () {
-      showMsg(t("msg.captcha"), "error");
-    };
-    document.head.appendChild(s);
+    renderWidget();
   }
 
   function getTurnstileToken() {
@@ -395,8 +447,13 @@
       }
       if (!validateForm()) { return; }
 
-      if (CONFIG.TURNSTILE_SITE_KEY && !getTurnstileToken()) {
-        showMsg(t("msg.captcha"), "error");
+      if (CONFIG.TURNSTILE_ENABLED && CONFIG.TURNSTILE_SITE_KEY && !getTurnstileToken()) {
+        showMsg(
+          turnstileBroken
+            ? turnstileErrorTextForSubmit()
+            : t("msg.captcha"),
+          "error"
+        );
         return;
       }
 

@@ -20,7 +20,10 @@ $cfg = is_file(__DIR__ . '/config.php') ? require __DIR__ . '/config.php' : [];
 
 define('TELEGRAM_TOKEN',   $cfg['telegram_token']   ?? '');
 define('TELEGRAM_CHAT_ID', $cfg['telegram_chat_id'] ?? '');
-define('TURNSTILE_SECRET', $cfg['turnstile_secret_key'] ?? '');
+$turnstileEnabled = array_key_exists('turnstile_enabled', $cfg)
+    ? (bool)$cfg['turnstile_enabled']
+    : trim((string)($cfg['turnstile_secret_key'] ?? '')) !== '';
+define('TURNSTILE_SECRET', $turnstileEnabled ? trim((string)($cfg['turnstile_secret_key'] ?? '')) : '');
 const CSV_FILE       = __DIR__ . '/leads.csv';
 const MIN_FILL_MS    = 2500;            // антибот: быстрее этого = бот
 const RATE_LIMIT_SEC = 45;              // не чаще 1 заявки с IP за это время

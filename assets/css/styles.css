@@ -1082,10 +1082,21 @@ ul { margin: 0; padding: 0; list-style: none; }
   width: 100%;
 }
 .turnstile-field #turnstileBox.is-error {
-  outline: 2px dashed var(--red);
-  outline-offset: 4px;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: rgba(217,4,61,.04);
+  border: 1px dashed rgba(217,4,61,.35);
   border-radius: var(--radius-sm);
 }
+.turnstile-field__error {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--red);
+  text-align: center;
+}
+.turnstile-field__retry { margin: 0 auto; }
 .lead__policy { color: var(--gray-400); font-size: 11px; text-align: center; margin: var(--space-3) 0 0; line-height: 1.45; }
 .form-msg { margin-top: var(--space-3); padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; }
 .form-msg.is-error { background: rgba(217,4,61,.08); color: var(--red); }

@@ -153,6 +153,10 @@ window.I18N = {
     "msg.validatePhone": "Укажите корректный номер Узбекистана: +998 XX XXX XX XX.",
     "msg.validateComment": "Комментарий слишком длинный или содержит недопустимые символы.",
     "msg.captcha": "Подтвердите, что вы не робот.",
+    "msg.captchaLoad": "Не удалось загрузить проверку. Обновите страницу или нажмите «Повторить».",
+    "msg.captchaKey": "Неверный ключ Turnstile. Проверьте site key в config.php.",
+    "msg.captchaDomain": "Домен «{host}» не добавлен в Cloudflare Turnstile. Администратору: Turnstile → Hostname Management → добавить этот домен.",
+    "msg.captchaRetry": "Повторить",
     "msg.sending": "Отправляем…"
   },
 
@@ -306,6 +310,10 @@ window.I18N = {
     "msg.validatePhone": "Oʻzbekiston raqamini toʻgʻri kiriting: +998 XX XXX XX XX.",
     "msg.validateComment": "Izoh juda uzun yoki notoʻgʻri belgilar bor.",
     "msg.captcha": "Robot emasligingizni tasdiqlang.",
+    "msg.captchaLoad": "Tekshiruv yuklanmadi. Sahifani yangilang yoki «Qayta urinish»ni bosing.",
+    "msg.captchaKey": "Turnstile kaliti notoʻgʻri. config.php dagi site key ni tekshiring.",
+    "msg.captchaDomain": "«{host}» domeni Cloudflare Turnstile ga qoʻshilmagan. Turnstile → Hostname Management.",
+    "msg.captchaRetry": "Qayta urinish",
     "msg.sending": "Yuborilmoqda…"
   }
 };

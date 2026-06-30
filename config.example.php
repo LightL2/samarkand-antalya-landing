@@ -12,7 +12,8 @@ return [
     'telegram_chat_id' => 'PASTE_YOUR_CHAT_ID_HERE',
 
     // Cloudflare Turnstile — https://dash.cloudflare.com → Turnstile → Add widget (Managed)
-    // Домен: samarkand.asialuxe.uz · режим: Managed (лёгкая проверка)
+    // В Hostname Management добавьте ВСЕ домены сайта (напр. samarkand.asialuxe.uz и alt.8bit.uz)
+    'turnstile_enabled'    => true,
     'turnstile_site_key'   => '',
     'turnstile_secret_key' => '',
 ];
