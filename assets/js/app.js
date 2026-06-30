@@ -358,6 +358,25 @@
       box.setAttribute("data-sitekey", CONFIG.TURNSTILE_SITE_KEY);
     }
 
+    function remountTurnstile() {
+      window.__turnstileToken = "";
+      turnstileReady = false;
+      turnstileBroken = false;
+      hideTurnstileError();
+      if (!box || !CONFIG.TURNSTILE_SITE_KEY) {
+        location.reload();
+        return;
+      }
+      box.setAttribute("data-sitekey", CONFIG.TURNSTILE_SITE_KEY);
+      if (window.turnstile && box.getAttribute("data-widget-id")) {
+        try {
+          window.turnstile.reset(box.getAttribute("data-widget-id"));
+          return;
+        } catch (e) {}
+      }
+      location.reload();
+    }
+
     function turnstileErrorText(code) {
       var host = location.hostname || "ваш домен";
       if (code === 110200 || code === "110200") {
@@ -365,7 +384,7 @@
       }
       if (code === 110100 || code === 110110 || code === "110100" || code === "110110" ||
           code === 400020 || code === "400020") {
-        return t("msg.captchaKey");
+        return t("msg.captchaKey").replace("{host}", host);
       }
       if (code === 200500 || code === "200500") {
         return t("msg.captchaBlocked");
@@ -389,14 +408,7 @@
         t("msg.captchaRetry") + "</button>";
       var retry = $("#turnstileRetry");
       if (retry) {
-        retry.addEventListener("click", function () {
-          hideTurnstileError();
-          if (window.turnstile && box.getAttribute("data-widget-id")) {
-            try { window.turnstile.reset(box.getAttribute("data-widget-id")); } catch (e) {}
-          } else {
-            location.reload();
-          }
-        });
+        retry.addEventListener("click", function () { remountTurnstile(); });
       }
     }
 
@@ -424,6 +436,11 @@
       if (box.getAttribute("data-widget-id")) return;
       if (!turnstileBroken) showTurnstileError("load");
     }, 20000);
+
+    window.addEventListener("pageshow", function (e) {
+      if (!e.persisted) return;
+      remountTurnstile();
+    });
   }
 
   function getTurnstileToken() {
