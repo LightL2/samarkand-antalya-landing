@@ -382,7 +382,8 @@
     }
 
     window.__showTurnstileError = showTurnstileError;
-    window.alTurnstileOk = function () {
+    window.alTurnstileOk = function (token) {
+      window.__turnstileToken = token || "";
       turnstileReady = true;
       turnstileBroken = false;
       hideTurnstileError();
@@ -397,6 +398,7 @@
     };
 
     if (window.__turnstileErrCode) showTurnstileError(window.__turnstileErrCode);
+    if (window.__turnstileToken || getTurnstileToken()) turnstileReady = true;
 
     setTimeout(function () {
       if (turnstileReady || getTurnstileToken()) return;
@@ -406,16 +408,24 @@
   }
 
   function getTurnstileToken() {
-    var el = form && form.querySelector('input[name="cf-turnstile-response"]');
-    return el ? el.value : "";
+    if (window.__turnstileToken) return window.__turnstileToken;
+    var el = document.querySelector(
+      'input[name="cf-turnstile-response"], textarea[name="cf-turnstile-response"]'
+    );
+    if (el && el.value) {
+      window.__turnstileToken = el.value;
+      return el.value;
+    }
+    return "";
   }
 
   function resetTurnstile() {
+    window.__turnstileToken = "";
+    turnstileReady = false;
     if (!window.turnstile || !CONFIG.TURNSTILE_SITE_KEY) return;
     var box = $("#turnstileBox");
     if (!box) return;
     var id = box.getAttribute("data-widget-id");
-    turnstileReady = false;
     if (id !== null && id !== "") {
       try { window.turnstile.reset(id); } catch (e) {}
     }
@@ -484,7 +494,10 @@
           openModal();
         })
         .catch(function (err) {
-          showMsg(err && err.code === "captcha" ? t("msg.captcha") : t("msg.error"), "error");
+          showMsg(
+            err && err.code === "captcha" ? t("msg.captchaFail") : t("msg.error"),
+            "error"
+          );
           resetTurnstile();
         })
         .then(function () {

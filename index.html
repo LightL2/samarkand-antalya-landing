@@ -660,7 +660,8 @@
       if (box) box.setAttribute("data-sitekey", window.TURNSTILE_SITE_KEY);
       if (field) field.hidden = false;
     })();
-    window.alTurnstileOk = function () {
+    window.alTurnstileOk = function (token) {
+      window.__turnstileToken = token || "";
       window.__turnstileReady = true;
       window.__turnstileBroken = false;
     };
