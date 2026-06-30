@@ -335,9 +335,7 @@
     if (!field || !box) return;
     field.hidden = false;
 
-    var widgetId = null;
-    var errorRetries = 0;
-    var MAX_ERROR_RETRIES = 2;
+    var mounted = false;
 
     function turnstileErrorText(code) {
       var host = location.hostname || "ваш домен";
@@ -353,35 +351,35 @@
     function showTurnstileError(code) {
       turnstileBroken = true;
       turnstileReady = false;
+      mounted = false;
       box.classList.add("is-error");
       box.innerHTML =
         '<p class="turnstile-field__error">' + turnstileErrorText(code) + "</p>" +
         '<button type="button" class="btn btn--sm btn--outline turnstile-field__retry" id="turnstileRetry">' +
         t("msg.captchaRetry") + "</button>";
       var retry = $("#turnstileRetry");
-      if (retry) retry.addEventListener("click", function () {
-        errorRetries = 0;
-        renderWidget();
-      });
-    }
-
-    function clearWidget() {
-      if (widgetId !== null && window.turnstile) {
-        try { window.turnstile.remove(widgetId); } catch (e) {}
+      if (retry) {
+        retry.addEventListener("click", function () {
+          box.classList.remove("is-error");
+          box.innerHTML = "";
+          mountTurnstile(true);
+        });
       }
-      widgetId = null;
-      box.removeAttribute("data-widget-id");
-      box.innerHTML = "";
     }
 
-    function doRender() {
+    function mountTurnstile(force) {
       if (!window.turnstile) return false;
-      clearWidget();
-      box.classList.remove("is-error");
-      turnstileBroken = false;
+      if (mounted && !force) return true;
+      if (force && box.getAttribute("data-widget-id")) {
+        try { window.turnstile.remove(box.getAttribute("data-widget-id")); } catch (e) {}
+        box.removeAttribute("data-widget-id");
+        box.innerHTML = "";
+        mounted = false;
+      }
+      if (mounted) return true;
 
       try {
-        widgetId = window.turnstile.render(box, {
+        var id = window.turnstile.render(box, {
           sitekey: CONFIG.TURNSTILE_SITE_KEY,
           theme: "light",
           retry: "auto",
@@ -389,16 +387,10 @@
           callback: function () {
             turnstileReady = true;
             turnstileBroken = false;
-            errorRetries = 0;
             box.classList.remove("is-error");
           },
           "error-callback": function (code) {
             turnstileReady = false;
-            if (errorRetries < MAX_ERROR_RETRIES) {
-              errorRetries += 1;
-              setTimeout(renderWidget, 1200);
-              return;
-            }
             showTurnstileError(code);
           },
           "expired-callback": function () {
@@ -406,7 +398,9 @@
             resetTurnstile();
           }
         });
-        box.setAttribute("data-widget-id", widgetId);
+        box.setAttribute("data-widget-id", id);
+        mounted = true;
+        turnstileBroken = false;
         return true;
       } catch (e) {
         showTurnstileError("render");
@@ -414,50 +408,20 @@
       }
     }
 
-    function renderWidget() {
-      turnstileBroken = false;
-
-      function start() {
-        window.turnstile.ready(function () {
-          field.hidden = false;
-          requestAnimationFrame(function () {
-            requestAnimationFrame(function () {
-              if (!doRender()) showTurnstileError("load");
-            });
-          });
-        });
-      }
-
-      if (window.turnstile) {
-        start();
-        return;
-      }
-
-      var waited = 0;
-      var timer = setInterval(function () {
-        waited += 100;
-        if (window.turnstile) {
-          clearInterval(timer);
-          start();
-        } else if (waited >= 10000) {
-          clearInterval(timer);
-          showTurnstileError("load");
-        }
-      }, 100);
-    }
-
-    function boot() {
-      renderWidget();
-    }
+    window.__mountTurnstile = function () { mountTurnstile(false); };
 
     if (window.__turnstileApiReady) {
-      boot();
-    } else {
-      document.addEventListener("al-turnstile-api-ready", boot, { once: true });
-      setTimeout(function () {
-        if (!window.__turnstileApiReady && !widgetId) boot();
-      }, 300);
+      mountTurnstile(false);
     }
+
+    setTimeout(function () {
+      if (!box.querySelector("iframe") && !box.classList.contains("is-error")) {
+        if (window.turnstile) mountTurnstile(false);
+        if (!box.querySelector("iframe") && !box.classList.contains("is-error")) {
+          showTurnstileError("load");
+        }
+      }
+    }, 12000);
   }
 
   function getTurnstileToken() {
